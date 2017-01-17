@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "nabu-3/provider-composer-plugin": "*",
+        "nabu-3/provider-composer-plugin": "*"
     },
     "prefer-stable": true
 }
