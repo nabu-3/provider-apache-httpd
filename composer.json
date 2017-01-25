@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "nabu-3/composer-installer-plugin": "*"
+        "nabu-3/composer-installer-plugin": "~3.0"
     },
     "prefer-stable": true
 }
