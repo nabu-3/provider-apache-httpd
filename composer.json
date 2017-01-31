@@ -1,5 +1,5 @@
 {
-    "type": "provider-package",
+    "type": "nabu-provider",
     "name": "nabu-3/provider-apache-httpd",
     "description": "nabu 3 provider to add Apache Server support",
     "keywords": [ "nabu-3", "nabu", "apache", "http", "https", "httpd", "provider" ],
@@ -9,7 +9,7 @@
             "url": "https://github.com/nabu-3/provider-apache-httpd"
         }
     ],
-    "version": "0.0.2",
+    "version": "0.0.3",
     "license": "Apache-2.0",
     "authors": [
         {
