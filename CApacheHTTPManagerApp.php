@@ -24,6 +24,7 @@ use \nabu\core\CNabuEngine;
 use \nabu\data\cluster\builtin\CNabuBuiltInServer;
 use \nabu\data\cluster\CNabuServer;
 use \nabu\data\site\builtin\CNabuBuiltInSite;
+use nabu\core\exceptions\ENabuCoreException;
 
 /**
  * Class based in CLI Application to manage Apache Web Server from the command line.
@@ -144,6 +145,10 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
     private function runClustered()
     {
         $nb_server = CNabuServer::findByKey($this->server_key);
+        if (!is_object($nb_server)) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_SERVER_NOT_FOUND, array($this->server_key, '*', '*'));
+        }
+
         $apache_server = new CApacheHTTPServer($nb_server);
 
         if ($apache_server->locateApacheServer()) {

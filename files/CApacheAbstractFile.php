@@ -19,7 +19,7 @@
 
 namespace providers\apache\httpd\files;
 
-use \devel\builders\text\CNabuTextBuilder;
+use \nabu\sdk\builders\text\CNabuTextBuilder;
 use \providers\apache\httpd\CApacheHTTPServer;
 
 /**

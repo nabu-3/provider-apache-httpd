@@ -22,7 +22,6 @@ namespace providers\apache\httpd;
 use nabu\cli\CNabuShell;
 use nabu\core\CNabuOS;
 use nabu\core\CNabuEngine;
-use nabu\core\exceptions\ENabuException;
 use nabu\core\exceptions\ENabuCoreException;
 use nabu\core\utils\CNabuURL;
 use nabu\data\cluster\CNabuServer;
@@ -46,6 +45,10 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
  */
 class CApacheHTTPServer extends CNabuHTTPServerAdapter
 {
+    /**
+     * Apache main config filename for nabu-3
+     * @var string
+     */
     const APACHE_CONFIG_FILENAME = 'nabu-3.conf';
 
     private $apachectl = false;

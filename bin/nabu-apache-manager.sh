@@ -25,7 +25,6 @@ echo
 NABU_ETC_PATH=/etc/opt/nabu-3.conf.d
 NABU_SCRIPT_PATH=`realpath $0`
 NABU_SCRIPT_PATH=`dirname $NABU_SCRIPT_PATH`
-echo $NABU_SCRIPT_PATH
 
 if [ -d ${NABU_ETC_PATH} ] && [ -f ${NABU_ETC_PATH}/nabu-3.conf ] ; then
     source ${NABU_ETC_PATH}/nabu-3.conf
