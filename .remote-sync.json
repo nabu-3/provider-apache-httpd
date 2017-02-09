@@ -1,0 +1,16 @@
+{
+  "transport": "ftp",
+  "uploadOnSave": true,
+  "useAtomicWrites": false,
+  "deleteLocal": false,
+  "hostname": "nabu-3.wiscot.com",
+  "port": "21",
+  "target": "/pub/providers/apache-httpd",
+  "ignore": [
+    ".remote-sync.json",
+    ".git/**"
+  ],
+  "username": "nabu-3",
+  "password": "rgt7254m",
+  "watch": []
+}

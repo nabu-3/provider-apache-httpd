@@ -1,15 +1,9 @@
 {
-    "type": "nabu-provider",
     "name": "nabu-3/provider-apache-httpd",
     "description": "nabu 3 provider to add Apache Server support",
+    "version": "0.0.5",
+    "type": "nabu-provider",
     "keywords": [ "nabu-3", "nabu", "apache", "http", "https", "httpd", "provider" ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/nabu-3/provider-apache-httpd"
-        }
-    ],
-    "version": "0.0.3",
     "license": "Apache-2.0",
     "authors": [
         {
@@ -18,8 +12,23 @@
             "role": "Developer"
         }
     ],
+    "support": {
+        "issues": "https://github.com/nabu-3/provider-apache-httpd/issues"
+    },
+    "config": {
+        "bin-dir": "bin",
+        "vendor-dir": "lib"
+    },
     "require": {
         "nabu-3/composer-installer-plugin": "~3.0"
     },
-    "prefer-stable": true
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/nabu-3/provider-apache-httpd"
+        }
+    ],
+    "bin": [
+        "bin/nabu-apache-manager.sh"
+    ]
 }
