@@ -54,7 +54,7 @@ class CApacheHostedIndex extends CApacheAbstractFile
     protected function getDescriptor()
     {
         return "# ===========================================================================\n"
-             . "# Nabu 3 - Apache HTTP Server Host Index\n"
+             . "# nabu-3 - Apache HTTP Server Host Index\n"
         ;
     }
 

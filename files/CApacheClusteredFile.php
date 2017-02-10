@@ -33,7 +33,7 @@ class CApacheClusteredFile extends CApacheHostedFile
     protected function getDescriptor()
     {
         return "# ===========================================================================\n"
-             . "# Nabu 3 - Apache HTTP Server Cluster configuration\n"
+             . "# nabu-3 - Apache HTTP Server Cluster configuration\n"
         ;
     }
 }

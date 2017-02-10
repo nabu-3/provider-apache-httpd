@@ -25,7 +25,7 @@ use \nabu\data\site\CNabuSite;
 use \providers\apache\httpd\CApacheHTTPServer;
 
 /**
- * Class to manage Nabu 3 Apache Hosted Config File
+ * Class to manage nabu-3 Apache Hosted Config File
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
  * @version 3.0.0 Surface
  * @package \providers\apache\httpd\files
@@ -65,7 +65,7 @@ class CApacheHostedFile extends CApacheAbstractFile
     protected function getDescriptor()
     {
         return "# ===========================================================================\n"
-             . "# Nabu 3 - Apache HTTP Server Host configuration\n"
+             . "# nabu-3 - Apache HTTP Server Host configuration\n"
         ;
     }
 

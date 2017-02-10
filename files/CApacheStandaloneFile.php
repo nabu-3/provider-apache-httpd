@@ -26,7 +26,7 @@ use \providers\apache\httpd\CApacheHTTPServer;
 use \providers\apache\httpd\files\CApacheAbstractFile;
 
 /**
- * Class to manage Nabu 3 Apache Standalone Config File
+ * Class to manage nabu-3 Apache Standalone Config File
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
  * @version 3.0.0 Surface
  * @package \providers\apache\httpd\files
@@ -58,7 +58,7 @@ class CApacheStandaloneFile extends CApacheAbstractFile
     protected function getDescriptor()
     {
         return "# ===========================================================================\n"
-             . "# Nabu 3 - Apache HTTP Server Standalone configuration\n"
+             . "# nabu-3 - Apache HTTP Server Standalone configuration\n"
         ;
     }
 

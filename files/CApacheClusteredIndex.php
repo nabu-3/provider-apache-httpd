@@ -33,7 +33,7 @@ class CApacheClusteredIndex extends CApacheHostedIndex
     protected function getDescriptor()
     {
         return "# ===========================================================================\n"
-             . "# Nabu 3 - Apache HTTP Server Cluster Index\n"
+             . "# nabu-3 - Apache HTTP Server Cluster Index\n"
         ;
     }
 }
