@@ -23,6 +23,7 @@ use \nabu\core\exceptions\ENabuCoreException;
 use \nabu\data\cluster\CNabuServer;
 use \nabu\data\site\CNabuSite;
 use \providers\apache\httpd\CApacheHTTPServer;
+use nabu\core\CNabuEngine;
 
 /**
  * Class to manage nabu-3 Apache Hosted Config File
@@ -84,6 +85,7 @@ class CApacheHostedFile extends CApacheAbstractFile
             throw new ENabuCoreException(ENabuCoreException::ERROR_OBJECT_EXPECTED);
         }
 
+        $nb_engine = CNabuEngine::getEngine();
         $nb_cluster_user_group = $nb_cluster_user->getGroup();
 
         $vhosts_list = $this->nb_site->getHostsForUpdate($this->nb_server);
@@ -105,7 +107,26 @@ class CApacheHostedFile extends CApacheAbstractFile
             $conf_path = $site_base_path .NABU_VHOST_CONFIG_FOLDER . DIRECTORY_SEPARATOR . $server_key;
             $site_key = $this->nb_site->getKey();
             $use_framework = $this->nb_site->isValueEqualThan('nb_site_use_framework', 'T');
-            $framework_path = $base_path . $this->nb_server->getFrameworkPath();
+            $framework_path = implode(PATH_SEPARATOR, $nb_engine->getPHPIncludeFolders());
+            $open_basedir = array(NABU_ETC_PATH, $site_base_path);
+            if (is_dir($icontact_path)) {
+                $open_basedir[] = $icontact_path;
+            }
+            if (is_dir($mediotecas_path)) {
+                $open_basedir[] = $mediotecas_path;
+            }
+            if (is_dir($emailing_path)) {
+                $open_basedir[] = $emailing_path;
+            }
+            if (is_dir($apps_path)) {
+                $open_basedir[] = $apps_path;
+            }
+            $open_basedir =
+                implode(PATH_SEPARATOR, $open_basedir) . PATH_SEPARATOR .
+                $framework_path . PATH_SEPARATOR .
+                (is_dir($runtime_path) ? realpath($runtime_path) . PATH_SEPARATOR : '') .
+                sys_get_temp_dir()
+            ;
 
 //            foreach($vhosts_list as $vhost) {
 //                $server_name = $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
@@ -215,8 +236,8 @@ class CApacheHostedFile extends CApacheAbstractFile
                 $output .= $padding . "                <IfModule $module_name>\n";
                 $output .= $padding . "                        php_admin_flag engine on\n";
                 $output .= $padding . "                        php_admin_flag safe_mode off\n";
-                $output .= $padding . "                        php_admin_value open_basedir \"" . NABU_ETC_PATH . PATH_SEPARATOR . "$site_base_path:$icontact_path:$mediotecas_path:$emailing_path:$apps_path" . ($use_framework ? ':'.$framework_path : '') . ":/tmp\"\n";
                 if ($use_framework) {
+                    $output .= $padding . "                        php_admin_value open_basedir \"$open_basedir\"\n";
                     $output .= $padding . "                        php_value include_path \".:$framework_path\"\n";
                 }
                 $output .= $padding . "                </IfModule>\n";
@@ -239,8 +260,8 @@ class CApacheHostedFile extends CApacheAbstractFile
                 $output .= $padding . "                <IfModule $module_name>\n";
                 $output .= $padding . "                        php_admin_flag engine on\n";
                 $output .= $padding . "                        php_admin_flag safe_mode off\n";
-                $output .= $padding . "                        php_admin_value open_basedir \"$site_base_path:$runtime_path/nbfw/3.0:$icontact_path:$mediotecas_path:$emailing_path:$apps_path" . ($use_framework ? ':'.$framework_path : '') . ":/tmp\"\n";
                 if ($use_framework) {
+                    $output .= $padding . "                        php_admin_value open_basedir \"$open_basedir\"\n";
                     $output .= $padding . "                        php_value include_path \".:$framework_path\"\n";
                 }
                 $output .= $padding . "                </IfModule>\n";

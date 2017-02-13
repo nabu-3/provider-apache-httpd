@@ -9,7 +9,10 @@
   "ignore": [
     ".remote-sync.json",
     ".git/**",
-    "lib/**"
+    "lib/**",
+    ".gitignore",
+    ".DS_Store",
+    "composer.json"
   ],
   "username": "nabu-3-core",
   "password": "C0d1g02017",
