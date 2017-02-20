@@ -95,7 +95,7 @@ class CApacheHostedFile extends CApacheAbstractFile
             $admin_user = $this->nb_server->getAdminUser();
             $server_key = $this->nb_server->getKey();
             $base_path = $this->nb_server->getBasePath();
-            $runtime_path = $base_path . NABU_RUNTIME_FOLDER;
+            $runtime_path = NABU_RUNTIME_PATH;
             $icontact_path = ''; //$base_path . '/icontact';
             $mediotecas_path = ''; //$base_path . '/mediotecas';
             $emailing_path = ''; //$base_path . '/emailing';
@@ -255,8 +255,6 @@ class CApacheHostedFile extends CApacheAbstractFile
                 $output .= $padding . "        <Directory $runtime_path>\n";
                 $output .= $padding . "                AllowOverride All\n";
                 $output .= $padding . "                Require all granted\n";
-                $output .= $padding . "        </Directory>\n";
-                $output .= $padding . "        <Directory $runtime_path/nbfw/3.0>\n";
                 $output .= $padding . "                <IfModule $module_name>\n";
                 $output .= $padding . "                        php_admin_flag engine on\n";
                 $output .= $padding . "                        php_admin_flag safe_mode off\n";
