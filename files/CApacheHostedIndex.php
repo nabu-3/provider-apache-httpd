@@ -70,6 +70,10 @@ class CApacheHostedIndex extends CApacheAbstractFile
             function ($site_key, $nb_site) use (&$output, $nb_server, $padding)
             {
                 if ($nb_site->isPublished()) {
+                    $site_path = CApacheHTTPServer::NABU_APACHE_ETC_PATH
+                               . $nb_site->getBasePath()
+                               . DIRECTORY_SEPARATOR . NABU_VHOST_CONFIG_FILENAME;
+                    /*
                     $site_path = $nb_server->getVirtualHostsPath()
                                . $nb_site->getBasePath()
                                . NABU_VHOST_CONFIG_FOLDER
@@ -77,6 +81,7 @@ class CApacheHostedIndex extends CApacheAbstractFile
                                . $nb_server->getKey()
                                . DIRECTORY_SEPARATOR
                                . NABU_VHOST_CONFIG_FILENAME;
+                    */
                     if (file_exists($site_path)) {
                         $output .= $padding . "# Host: " . $nb_site->getTranslation($nb_site->getDefaultLanguageId())->getName() . "\n";
                         $output .= $padding . "Include \"$site_path\"\n";

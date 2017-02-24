@@ -32,6 +32,7 @@ use nabu\data\site\CNabuSite;
 use nabu\data\site\CNabuSiteList;
 use nabu\data\site\CNabuSiteAlias;
 use nabu\http\adapters\CNabuHTTPServerAdapter;
+use providers\apache\httpd\files\CApacheHostedFile;
 use providers\apache\httpd\files\CApacheClusteredIndex;
 use providers\apache\httpd\files\CApacheHostedIndex;
 use providers\apache\httpd\files\CApacheClusteredFile;
@@ -45,16 +46,19 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
  */
 class CApacheHTTPServer extends CNabuHTTPServerAdapter
 {
-    /**
-     * Apache main config filename for nabu-3
-     * @var string
-     */
+    /** @var string APACHE_CONFIG_FILENAME Apache main config filename for nabu-3 */
     const APACHE_CONFIG_FILENAME = 'nabu-3.conf';
-
+    /** @var string APACHE_ETC_PATH Apache etc folder */
+    const NABU_APACHE_ETC_PATH = NABU_ETC_PATH . DIRECTORY_SEPARATOR . 'httpd';
+    /** @var string $apachectl Apache main shell script (apachectl) including full path. */
     private $apachectl = false;
+    /** @var array $apache_info Array with all information fields about Apache version. */
     private $apache_info = null;
+    /** @var array $apache_compiles Array with compiled options of Apache. */
     private $apache_compiles = null;
+    /** @var string $apache_config_path Real nabu-3 Apache config path. */
     private $apache_config_path = false;
+    /** @var string $php_module Name of PHP Module for Apache detected. */
     private $php_module = false;
 
     public function locateApacheServer()
@@ -305,6 +309,8 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     {
         $file = new CApacheClusteredFile($this, $this->nb_server, $nb_site);
         $file->create();
+        $path = self::NABU_APACHE_ETC_PATH . $nb_site->getBasePath();
+        /*
         $path = $this->nb_server->getVirtualHostsPath()
                   . DIRECTORY_SEPARATOR
                   . $nb_site->getBasePath()
@@ -312,6 +318,7 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
                   . DIRECTORY_SEPARATOR
                   . $this->nb_server->getKey()
         ;
+        */
         if (!is_dir($path)) {
             mkdir($path, 0755, true);
         }
