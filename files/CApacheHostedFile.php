@@ -28,20 +28,15 @@ use nabu\core\CNabuEngine;
 /**
  * Class to manage nabu-3 Apache Hosted Config File
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
- * @version 3.0.0 Surface
+ * @since 0.0.1
+ * @version 0.0.7
  * @package \providers\apache\httpd\files
  */
 class CApacheHostedFile extends CApacheAbstractFile
 {
-    /**
-     * Server instance to build file
-     * @var CNabuServer
-     */
+    /** @var CNabuServer $nb_server Server instance to build file. */
     private $nb_server;
-    /**
-     * Site instance to build file
-     * @var CNabuSite
-     */
+    /** @var CNabuSite $nb_site Site instance to build file. */
     private $nb_site;
 
     /**
@@ -94,40 +89,26 @@ class CApacheHostedFile extends CApacheAbstractFile
             $module_name = $this->getHTTPServer()->getPHPModule();
             $admin_user = $this->nb_server->getAdminUser();
             $server_key = $this->nb_server->getKey();
-            $base_path = $this->nb_server->getBasePath();
-            $runtime_path = NABU_RUNTIME_PATH;
-            $icontact_path = ''; //$base_path . '/icontact';
-            $mediotecas_path = ''; //$base_path . '/mediotecas';
-            $emailing_path = ''; //$base_path . '/emailing';
-            $apps_path = ''; //$base_path . '/apps';
-            $vhosts_path = $this->nb_server->getVirtualHostsPath();
-            $logs_path = $this->nb_server->getLogsPath() . DIRECTORY_SEPARATOR . $server_key;
-            $site_base_path = $vhosts_path . $this->nb_site->getBasePath();
+            $runtime_path = $this->nb_server->getRuntimePath();
+            $logs_path = $this->nb_server->getLogsPath();
+            $site_base_path = $this->nb_site->getVirtualHostsPath($this->nb_server);
+            $site_lib_path = $this->nb_site->getVirtualLibrariesPath($this->nb_server);
+            $site_cache_path = $this->nb_site->getVirtualCachePath($this->nb_server);
             $site_commons = $site_base_path . NABU_COMMONDOCS_FOLDER;
             $site_php_path = $site_base_path . NABU_SITE_PHP_FOLDER;
             $conf_path = $site_base_path . NABU_VHOST_CONFIG_FOLDER . DIRECTORY_SEPARATOR . $server_key;
             $site_key = $this->nb_site->getKey();
             $use_framework = $this->nb_site->isValueEqualThan('nb_site_use_framework', 'T');
             $framework_path = implode(PATH_SEPARATOR, $nb_engine->getPHPIncludeFolders());
-            $open_basedir = array(NABU_ETC_PATH, $site_base_path);
-            if (is_dir($icontact_path)) {
-                $open_basedir[] = $icontact_path;
-            }
-            if (is_dir($mediotecas_path)) {
-                $open_basedir[] = $mediotecas_path;
-            }
-            if (is_dir($emailing_path)) {
-                $open_basedir[] = $emailing_path;
-            }
-            if (is_dir($apps_path)) {
-                $open_basedir[] = $apps_path;
-            }
-            $open_basedir =
-                implode(PATH_SEPARATOR, $open_basedir) . PATH_SEPARATOR .
-                $framework_path . PATH_SEPARATOR .
-                (is_dir($runtime_path) ? realpath($runtime_path) . PATH_SEPARATOR : '') .
+            $open_basedir = array(
+                $site_base_path,
+                $site_lib_path,
+                $site_cache_path,
+                NABU_ETC_PATH,
+                $framework_path,
                 sys_get_temp_dir()
-            ;
+            );
+            $open_basedir = implode(PATH_SEPARATOR, $open_basedir);
 
 //            foreach($vhosts_list as $vhost) {
 //                $server_name = $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];

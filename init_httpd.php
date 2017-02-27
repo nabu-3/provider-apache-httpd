@@ -17,24 +17,19 @@
  *  limitations under the License.
  */
 
-namespace providers\apache\httpd\files;
-
 /**
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
- * @since 0.0.1
+ * @since 0.0.7
  * @version 0.0.7
- * @package \providers\apache\httpd\files
+ * @package \providers\apache\httpd
  */
-class CApacheClusteredIndex extends CApacheHostedIndex
-{
-    /**
-     * Overrides parent method to place the main header of file before the license agreement.
-     * @return string Returns the text to be placed at the start of the file.
-     */
-    protected function getDescriptor()
-    {
-        return "# ===========================================================================\n"
-             . "# nabu-3 - Apache HTTP Server Cluster Index\n"
-        ;
-    }
+
+define('APACHE_HTTPD_VENDOR_KEY', 'Apache');
+define('APACHE_HTTPD_MODULE_KEY', 'httpd');
+define('APACHE_HTTPD_MANAGER_KEY', 'ApacheHttpdManager');
+
+define('APACHE_HTTPD_PROVIDER_PATH', dirname(__FILE__));
+
+if (!defined('APACHE_HTTPD_SYS_USER')) {
+    define('APACHE_HTTPD_SYS_USER', 'apache');
 }

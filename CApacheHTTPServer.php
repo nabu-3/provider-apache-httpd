@@ -41,8 +41,9 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
 /**
  * Main class to manage Apache HTTP Server
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
- * @version 3.0.0 Surface
- * @package providers\apache\httpd
+ * @since 0.0.1
+ * @version 0.0.7
+ * @package \providers\apache\httpd
  */
 class CApacheHTTPServer extends CNabuHTTPServerAdapter
 {
@@ -258,6 +259,7 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
             $index_list = $this->nb_server->getSitesIndex();
             $index_list->iterate(
                 function ($site_key, $nb_site) {
+                    $this->createSiteFolders($nb_site);
                     $this->createClusteredFile($nb_site);
 
                     return true;
@@ -309,7 +311,7 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     {
         $file = new CApacheClusteredFile($this, $this->nb_server, $nb_site);
         $file->create();
-        $path = self::NABU_APACHE_ETC_PATH . $nb_site->getBasePath();
+        $path = self::NABU_APACHE_ETC_PATH . DIRECTORY_SEPARATOR . $nb_site->getBasePath();
         /*
         $path = $this->nb_server->getVirtualHostsPath()
                   . DIRECTORY_SEPARATOR
@@ -327,6 +329,69 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         }
         $filename = $path . DIRECTORY_SEPARATOR . NABU_VHOST_CONFIG_FILENAME;
         $file->exportToFile($filename);
+    }
+
+    /**
+     * Create Site Folders for the requested Site.
+     * @param CNabuSite $nb_site Site instance to create folders.
+     * @return bool Returns true if all required folders exists.
+     * @throws ENabuCoreException Raises an exception if a folder cannot be available.
+     */
+    public function createSiteFolders(CNabuSite $nb_site)
+    {
+        $vhosts_path = $this->nb_server->getVirtualHostsPath();
+        if (!is_dir($vhosts_path) && !mkdir($vhosts_path, 0755, true)) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vhosts_path));
+        }
+        $vlib_path = $this->nb_server->getVirtualLibrariesPath();
+        if (!is_dir($vlib_path) && !mkdir($vlib_path, 0755, true)) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vlib_path));
+        }
+        $vcache_path = $this->nb_server->getVirtualCachePath();
+        if (!is_dir($vcache_path) && !mkdir($vcache_path, 0755, true)) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vcache_path));
+        }
+
+        $nb_cluster_user = $nb_site->getClusterUser();
+        if ($nb_cluster_user === null) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_OBJECT_EXPECTED);
+        }
+        $nb_cluster_user_group = $nb_cluster_user->getGroup();
+        if ($nb_cluster_user_group === null) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_OBJECT_EXPECTED);
+        }
+        $owner_name = $nb_cluster_user->getOSNick();
+        $owner_group = $nb_cluster_user_group->getOSNick();
+
+        $vhosts_path = $nb_site->getVirtualHostsPath($this->nb_server);
+        if (!is_dir($vhosts_path)) {
+            if (!mkdir($vhosts_path, 0755, true)) {
+                throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vhosts_path));
+            } else {
+                chown($vhosts_path, $owner_name);
+                chgrp($vhosts_path, $owner_group);
+            }
+        }
+        $vlib_path = $nb_site->getVirtualLibrariesPath($this->nb_server);
+        if (!is_dir($vlib_path)) {
+            if (!mkdir($vlib_path, 0755, true)) {
+                throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vlib_path));
+            } else {
+                chown($vlib_path, APACHE_HTTPD_SYS_USER);
+                chgrp($vlib_path, $owner_group);
+            }
+        }
+        $vcache_path = $nb_site->getVirtualCachePath($this->nb_server);
+        if (!is_dir($vcache_path)) {
+            if (!mkdir($vcache_path, 0755, true)) {
+                throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vcache_path));
+            } else {
+                chown($vcache_path, APACHE_HTTPD_SYS_USER);
+                chgrp($vcache_path, $owner_group);
+            }
+        }
+
+        return true;
     }
 
     public function locateRunningConfiguration()

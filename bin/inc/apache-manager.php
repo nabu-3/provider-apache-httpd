@@ -21,8 +21,9 @@ use nabu\core\CNabuEngine;
 
 /**
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
- * @version 3.0.0 Surface
- * @package nabu-apache-manager
+ * @since 0.0.1
+ * @version 0.0.7
+ * @package \providers\apache\httpd
  */
 
 require_once 'common.php';

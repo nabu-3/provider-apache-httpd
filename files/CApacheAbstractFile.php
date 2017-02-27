@@ -25,11 +25,13 @@ use \providers\apache\httpd\CApacheHTTPServer;
 /**
  * Abstract class to manage all config files of Apache HTTP Server.
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
- * @version 3.0.0 Surface
+ * @since 0.0.1
+ * @version 0.0.7
  * @package \providers\apache\httpd\files
  */
 class CApacheAbstractFile extends CNabuTextBuilder
 {
+    /** @var CApacheHTTPServer $http_server Apache HTTP Server instance. */
     private $http_server;
 
     public function __construct(CApacheHTTPServer $http_server)

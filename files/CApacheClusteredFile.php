@@ -21,8 +21,9 @@ namespace providers\apache\httpd\files;
 
 /**
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
- * @version 3.0.0 Surface
- * @package name
+ * @since 0.0.1
+ * @version 0.0.7
+ * @package \providers\apache\httpd\files
  */
 class CApacheClusteredFile extends CApacheHostedFile
 {

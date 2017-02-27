@@ -24,15 +24,13 @@ use nabu\data\site\CNabuSiteList;
 
 /**
  * @author Rafael Gutierrez <rgutierrez@wiscot.com>
- * @version 3.0.0 Surface
- * @package name
+ * @since 0.0.1
+ * @version 0.0.7
+ * @package \providers\apache\httpd\files
  */
 class CApacheHostedIndex extends CApacheAbstractFile
 {
-    /**
-     * Collection of sites to be listed in the index.
-     * @var CNabuSiteList
-     */
+    /** @var CNabuSiteList $index_list Collection of sites to be listed in the index. */
     private $index_list = null;
 
     /**
@@ -71,7 +69,7 @@ class CApacheHostedIndex extends CApacheAbstractFile
             {
                 if ($nb_site->isPublished()) {
                     $site_path = CApacheHTTPServer::NABU_APACHE_ETC_PATH
-                               . $nb_site->getBasePath()
+                               . DIRECTORY_SEPARATOR . $nb_site->getBasePath()
                                . DIRECTORY_SEPARATOR . NABU_VHOST_CONFIG_FILENAME;
                     /*
                     $site_path = $nb_server->getVirtualHostsPath()
