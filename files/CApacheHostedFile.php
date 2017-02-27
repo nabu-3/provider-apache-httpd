@@ -104,6 +104,7 @@ class CApacheHostedFile extends CApacheAbstractFile
             $logs_path = $this->nb_server->getLogsPath() . DIRECTORY_SEPARATOR . $server_key;
             $site_base_path = $vhosts_path . $this->nb_site->getBasePath();
             $site_commons = $site_base_path . NABU_COMMONDOCS_FOLDER;
+            $site_php_path = $site_base_path . NABU_SITE_PHP_FOLDER;
             $conf_path = $site_base_path . NABU_VHOST_CONFIG_FOLDER . DIRECTORY_SEPARATOR . $server_key;
             $site_key = $this->nb_site->getKey();
             $use_framework = $this->nb_site->isValueEqualThan('nb_site_use_framework', 'T');
@@ -238,7 +239,7 @@ class CApacheHostedFile extends CApacheAbstractFile
                 $output .= $padding . "                        php_admin_flag safe_mode off\n";
                 if ($use_framework) {
                     $output .= $padding . "                        php_admin_value open_basedir \"$open_basedir\"\n";
-                    $output .= $padding . "                        php_value include_path \".:$framework_path\"\n";
+                    $output .= $padding . "                        php_value include_path \".:$site_php_path:$framework_path\"\n";
                 }
                 $output .= $padding . "                </IfModule>\n";
                 $output .= $padding . "                AllowOverride All\n";
