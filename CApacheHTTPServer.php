@@ -363,7 +363,7 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $owner_name = $nb_cluster_user->getOSNick();
         $owner_group = $nb_cluster_user_group->getOSNick();
 
-        $vhosts_path = $nb_site->getVirtualHostsPath($this->nb_server);
+        $vhosts_path = $nb_site->getVirtualHostPath($this->nb_server);
         if (!is_dir($vhosts_path)) {
             if (!mkdir($vhosts_path, 0755, true)) {
                 throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vhosts_path));
@@ -778,7 +778,7 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     /**
      * Checks if a server is valid.
      * Valid servers are Built-in instances or fetched servers.
-     * @return boolean Returns true if the server is valid.
+     * @return bool Returns true if the server is valid.
      */
     public function isServerValid()
     {

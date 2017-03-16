@@ -91,11 +91,11 @@ class CApacheHostedFile extends CApacheAbstractFile
             $server_key = $this->nb_server->getKey();
             $runtime_path = $this->nb_server->getRuntimePath();
             $logs_path = $this->nb_server->getLogsPath();
-            $site_base_path = $this->nb_site->getVirtualHostsPath($this->nb_server);
+            $site_base_path = $this->nb_site->getVirtualHostPath($this->nb_server);
             $site_lib_path = $this->nb_site->getVirtualLibrariesPath($this->nb_server);
             $site_cache_path = $this->nb_site->getVirtualCachePath($this->nb_server);
             $site_commons = $site_base_path . NABU_COMMONDOCS_FOLDER;
-            $site_php_path = $site_base_path . NABU_SITE_PHP_FOLDER;
+            $site_php_path = $site_base_path . NABU_PHP_FOLDER;
             $conf_path = $site_base_path . NABU_VHOST_CONFIG_FOLDER . DIRECTORY_SEPARATOR . $server_key;
             $site_key = $this->nb_site->getKey();
             $use_framework = $this->nb_site->isValueEqualThan('nb_site_use_framework', 'T');
