@@ -18,7 +18,7 @@
  */
 
 /**
- * @author Rafael Gutierrez <rgutierrez@wiscot.com>
+ * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.7
  * @version 0.0.7
  * @package \providers\apache\httpd

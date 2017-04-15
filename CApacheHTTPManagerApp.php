@@ -29,7 +29,7 @@ use nabu\core\exceptions\ENabuCoreException;
 /**
  * Class based in CLI Application to manage Apache Web Server from the command line.
  * This class works coordinated with the bin file nabu-apache-manager.sh
- * @author Rafael Gutierrez <rgutierrez@wiscot.com>
+ * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
  * @version 0.0.7
  * @package \providers\apache\httpd

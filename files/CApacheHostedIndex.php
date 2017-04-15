@@ -23,7 +23,7 @@ use \providers\apache\httpd\CApacheHTTPServer;
 use nabu\data\site\CNabuSiteList;
 
 /**
- * @author Rafael Gutierrez <rgutierrez@wiscot.com>
+ * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
  * @version 0.0.7
  * @package \providers\apache\httpd\files

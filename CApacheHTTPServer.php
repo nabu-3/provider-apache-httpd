@@ -40,7 +40,7 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
 
 /**
  * Main class to manage Apache HTTP Server
- * @author Rafael Gutierrez <rgutierrez@wiscot.com>
+ * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
  * @version 0.0.7
  * @package \providers\apache\httpd
