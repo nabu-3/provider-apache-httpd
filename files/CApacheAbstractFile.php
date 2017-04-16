@@ -55,7 +55,7 @@ class CApacheAbstractFile extends CNabuTextBuilder
      * @param string $padding Padding to place at the beginning of each line
      * @return string Returns the license as a PHP comment string
      */
-    protected function getLicense($padding = '')
+    protected function getLicense(string $padding = '') : string
     {
         return "$padding# ===========================================================================\n"
              . "$padding# File generated automatically by nabu-3\n"
