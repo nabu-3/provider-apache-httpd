@@ -58,7 +58,7 @@ class CApacheHostedFile extends CApacheAbstractFile
      * Overrides parent method to place the main header of file before the license agreement.
      * @return string Returns the text to be placed at the start of the file.
      */
-    protected function getDescriptor()
+    protected function getDescriptor() : string
     {
         return "# ===========================================================================\n"
              . "# nabu-3 - Apache HTTP Server Host configuration\n"
@@ -71,7 +71,7 @@ class CApacheHostedFile extends CApacheAbstractFile
      * @param string $padding Padding to be applied.
      * @return string Output string to be placed in memory or file.
      */
-    protected function getContent($padding = '')
+    protected function getContent(string $padding = '') : string
     {
         $output = '';
 

@@ -49,14 +49,14 @@ class CApacheHostedIndex extends CApacheAbstractFile
      * Overrides parent method to place the main header of file before the license agreement.
      * @return string Returns the text to be placed at the start of the file.
      */
-    protected function getDescriptor()
+    protected function getDescriptor() : string
     {
         return "# ===========================================================================\n"
              . "# nabu-3 - Apache HTTP Server Host Index\n"
         ;
     }
 
-    protected function getContent($padding = '')
+    protected function getContent(string $padding = '') : string
     {
         $http_server = $this->getHTTPServer();
         $nb_server = $http_server->getServer();
