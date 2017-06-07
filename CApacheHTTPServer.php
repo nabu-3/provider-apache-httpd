@@ -26,6 +26,7 @@ use nabu\core\exceptions\ENabuCoreException;
 use nabu\core\utils\CNabuURL;
 use nabu\data\cluster\CNabuServer;
 use nabu\data\cluster\CNabuServerHost;
+use nabu\data\customer\CNabuCustomer;
 use nabu\data\domain\CNabuDomainZone;
 use nabu\data\domain\CNabuDomainZoneHost;
 use nabu\data\site\CNabuSite;
@@ -400,6 +401,8 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
             $this->locateNabuServer();
         }
 
+        $this->locateCustomer();
+
         if ($this->nb_site === null) {
             $this->locateNabuSite();
         }
@@ -447,6 +450,19 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $this->nb_server;
     }
 
+    private function locateCustomer()
+    {
+        $nb_engine = CNabuEngine::getEngine();
+        $nb_customer = $nb_engine->getCustomer();
+
+        if ($nb_customer === null && $this->nb_server->contains(NABU_CUSTOMER_FIELD_ID)) {
+            $nb_customer = new CNabuCustomer($this->nb_server->getValue(NABU_CUSTOMER_FIELD_ID));
+            if ($nb_customer->isFetched()) {
+                $nb_engine->setCustomer($nb_customer);
+            }
+        }
+    }
+
     private function locateNabuDomainZone()
     {
         $nb_engine = CNabuEngine::getEngine();
@@ -482,12 +498,12 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $this->nb_site_alias_force_default = false;
 
         if ($this->nb_server->contains(NABU_SITE_FIELD_ID)) {
-            $this->nb_site = new CNabuSite($this->nb_server);
+            $this->nb_site = $nb_engine->getCustomer()->getSite($this->nb_server);
         } elseif (($server_name = $this->getServerName())) {
-            $this->nb_site = CNabuSite::findByAlias($server_name);
+            $this->nb_site = $nb_engine->getCustomer()->getSiteByAlias($server_name);
         }
 
-        if ($this->nb_site === null || $this->nb_site->isNew()) {
+        if ($this->nb_site === null || !$this->nb_site->isFetched()) {
             throw new ENabuCoreException(ENabuCoreException::ERROR_SITE_NOT_FOUND);
         } elseif (!$this->nb_site->isPublished()) {
             throw new ENabuCoreException(ENabuCoreException::ERROR_SITE_NOT_PUBLISHED, $this->nb_site->getId());
@@ -499,7 +515,7 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
             $this->nb_site_alias = new CNabuSiteAlias($this->nb_site);
         }
 
-        if ($this->nb_site_alias === null || $this->nb_site_alias->isNew()) {
+        if ($this->nb_site_alias === null || !$this->nb_site_alias->isFetched()) {
             throw new ENabuCoreException(ENabuCoreException::ERROR_SITE_ALIAS_NOT_FOUND);
         }
 
