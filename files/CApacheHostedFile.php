@@ -110,48 +110,48 @@ class CApacheHostedFile extends CApacheAbstractFile
             );
             $open_basedir = implode(PATH_SEPARATOR, $open_basedir);
 
-//            foreach($vhosts_list as $vhost) {
-//                $server_name = $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
-//                $use_ssl = ($vhost['host']['nb_cluster_group_service_use_ssl'] === 'T');
-//                $docs = ($use_ssl ? NABU_HTTPDOCS_FOLDER : NABU_HTTPSDOCS_FOLDER);
-//                if (array_key_exists('redirections', $vhost) && count($vhost['redirections']) > 0) {
-//                    foreach ($vhost['redirections']  as $redirection) {
-//                        $target_name = $redirection['nb_domain_zone_host_name'].'.'.$redirection['nb_domain_zone_name'];
-//                        $target_ssl = ($redirection['nb_cluster_group_service_use_ssl'] === 'T');
-//                        $output .= $padding . "<VirtualHost " . $redirection['nb_ip_ip'] . ':' . $redirection['nb_server_host_port'] . ">\n");
-//                        $output .= $padding . "        ServerName $target_name\n");
-//                        $output .= $padding . "\n");
-//                        if ($target_ssl) {
-//                            $output .= $padding . "        <IfModule mod_ssl.c>\n");
-//                            $output .= $padding . "                SSLEngine on\n");
-//                            $output .= $padding . "                SSLVerifyClient none\n");
-//                            if (file_exists("$site_base_path/private/$site_key.crt")) {
-//                                $output .= $padding . "                SSLCertificateFile $site_base_path/private/$site_key.crt\n");
-//                            }
-//                            if (file_exists("$site_base_path/private/$site_key" . "_private.key")) {
-//                                $output .= $padding . "                SSLCertificateKeyFile $site_base_path/private/$site_key" . "_private.key\n");
-//                            }
-//                            if (file_exists("$site_base_path/private/$site_key" . "_intermediate.crt")) {
-//                                $output .= $padding . "                SSLCertificateChainFile $site_base_path/private/$site_key" . "_intermediate.crt\n");
-//                            }
-//                            if (file_exists("$site_base_path/private/$site_key" . "_root.crt")) {
-//                                $output .= $padding . "                SSLCACertificateFile $site_base_path/private/$site_key" . "_root.crt\n");
-//                            }
-//                            $output .= $padding . "                SSLProxyEngine on\n");
-//                            $output .= $padding . "        </IfModule>\n");
-//                        } else {
-//                            $output .= $padding . "        <IfModule mod_ssl.c>\n");
-//                            $output .= $padding . "                SSLEngine off\n");
-//                            $output .= $padding . "        </IfModule>\n");
-//                        }
-//                        $output .= $padding . "\n");
-//                        $output .= $padding . "        RewriteEngine on\n");
-//                        $output .= $padding . "        RewriteRule ^(.*)$ ".($use_ssl ? 'https:://' : 'http://').$server_name."/$1?%{QUERY_STRING} [L]\n");
-//
-//                        $output .= $padding . "</VirtualHost>\n");
-//                    }
-//                }
-//            }
+            foreach($vhosts_list as $vhost) {
+                $server_name = $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
+                $use_ssl = ($vhost['host']['nb_cluster_group_service_use_ssl'] === 'T');
+                $docs = ($use_ssl ? NABU_HTTPDOCS_FOLDER : NABU_HTTPSDOCS_FOLDER);
+                if (array_key_exists('redirections', $vhost) && count($vhost['redirections']) > 0) {
+                    foreach ($vhost['redirections']  as $redirection) {
+                        $target_name = $redirection['nb_domain_zone_host_name'].'.'.$redirection['nb_domain_zone_name'];
+                        $target_ssl = ($redirection['nb_cluster_group_service_use_ssl'] === 'T');
+                        $output .= $padding . "<VirtualHost " . $redirection['nb_ip_ip'] . ':' . $redirection['nb_server_host_port'] . ">\n";
+                        $output .= $padding . "        ServerName $target_name\n";
+                        $output .= $padding . "\n";
+                        if ($target_ssl) {
+                            $output .= $padding . "        <IfModule mod_ssl.c>\n";
+                            $output .= $padding . "                SSLEngine on\n";
+                            $output .= $padding . "                SSLVerifyClient none\n";
+                            if (file_exists("$site_base_path/private/$site_key.crt")) {
+                                $output .= $padding . "                SSLCertificateFile $site_base_path/private/$site_key.crt\n";
+                            }
+                            if (file_exists("$site_base_path/private/$site_key" . "_private.key")) {
+                                $output .= $padding . "                SSLCertificateKeyFile $site_base_path/private/$site_key" . "_private.key\n";
+                            }
+                            if (file_exists("$site_base_path/private/$site_key" . "_intermediate.crt")) {
+                                $output .= $padding . "                SSLCertificateChainFile $site_base_path/private/$site_key" . "_intermediate.crt\n";
+                            }
+                            if (file_exists("$site_base_path/private/$site_key" . "_root.crt")) {
+                                $output .= $padding . "                SSLCACertificateFile $site_base_path/private/$site_key" . "_root.crt\n";
+                            }
+                            $output .= $padding . "                SSLProxyEngine on\n";
+                            $output .= $padding . "        </IfModule>\n";
+                        } else {
+                            $output .= $padding . "        <IfModule mod_ssl.c>\n";
+                            $output .= $padding . "                SSLEngine off\n";
+                            $output .= $padding . "        </IfModule>\n";
+                        }
+                        $output .= $padding . "\n";
+                        $output .= $padding . "        RewriteEngine on\n";
+                        $output .= $padding . "        RewriteRule ^(.*)$ ".($use_ssl ? 'https:://' : 'http://').$server_name."/$1?%{QUERY_STRING} [L]\n";
+
+                        $output .= $padding . "</VirtualHost>\n";
+                    }
+               }
+           }
 
             foreach($vhosts_list as $vhost) {
                 $server_name = $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
