@@ -25,7 +25,7 @@ use nabu\data\site\CNabuSiteList;
 /**
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.7
+ * @version 0.0.8
  * @package \providers\apache\httpd\files
  */
 class CApacheHostedIndex extends CApacheAbstractFile
@@ -36,7 +36,7 @@ class CApacheHostedIndex extends CApacheAbstractFile
     /**
      * Constructor.
      * @param CApacheHTTPServer $http_server
-     * @param array $index_list Index List of sites to figure in the index.
+     * @param CNabuSiteList $index_list Index List of sites to figure in the index.
      */
     public function __construct(CApacheHTTPServer $http_server, CNabuSiteList $index_list)
     {

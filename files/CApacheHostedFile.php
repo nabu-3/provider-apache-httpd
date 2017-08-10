@@ -29,7 +29,7 @@ use nabu\core\CNabuEngine;
  * Class to manage nabu-3 Apache Hosted Config File
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.7
+ * @version 0.0.8
  * @package \providers\apache\httpd\files
  */
 class CApacheHostedFile extends CApacheAbstractFile
@@ -41,6 +41,7 @@ class CApacheHostedFile extends CApacheAbstractFile
 
     /**
      * Constructor.
+     * @param CApacheHTTPServer $apache_server Apache Server entity
      * @param CNabuServer $nb_server Server entity to configure file
      * @param CNabuSite $nb_site Site entity to configure file
      * @throws ENabuCoreException Throws this exception if param $nb_server is empty
@@ -111,12 +112,16 @@ class CApacheHostedFile extends CApacheAbstractFile
             $open_basedir = implode(PATH_SEPARATOR, $open_basedir);
 
             foreach($vhosts_list as $vhost) {
-                $server_name = $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
+                $server_name = $vhost['host']['nb_domain_zone_host_name'] === '@'
+                             ? $vhost['host']['nb_domain_zone_name']
+                             : $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
                 $use_ssl = ($vhost['host']['nb_cluster_group_service_use_ssl'] === 'T');
                 $docs = ($use_ssl ? NABU_HTTPDOCS_FOLDER : NABU_HTTPSDOCS_FOLDER);
                 if (array_key_exists('redirections', $vhost) && count($vhost['redirections']) > 0) {
                     foreach ($vhost['redirections']  as $redirection) {
-                        $target_name = $redirection['nb_domain_zone_host_name'].'.'.$redirection['nb_domain_zone_name'];
+                        $target_name = $redirection['nb_domain_zone_host_name'] === '@'
+                                     ? $redirection['nb_domain_zone_name']
+                                     : $redirection['nb_domain_zone_host_name'].'.'.$redirection['nb_domain_zone_name'];
                         $target_ssl = ($redirection['nb_cluster_group_service_use_ssl'] === 'T');
                         $output .= $padding . "<VirtualHost " . $redirection['nb_ip_ip'] . ':' . $redirection['nb_server_host_port'] . ">\n";
                         $output .= $padding . "        ServerName $target_name\n";
@@ -150,11 +155,13 @@ class CApacheHostedFile extends CApacheAbstractFile
 
                         $output .= $padding . "</VirtualHost>\n";
                     }
-               }
-           }
+                }
+            }
 
             foreach($vhosts_list as $vhost) {
-                $server_name = $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
+                $server_name = $vhost['host']['nb_domain_zone_host_name'] == '@'
+                             ? $vhost['host']['nb_domain_zone_name']
+                             : $vhost['host']['nb_domain_zone_host_name'].'.'.$vhost['host']['nb_domain_zone_name'];
                 $use_ssl = ($vhost['host']['nb_cluster_group_service_use_ssl'] === 'T');
                 $docs = ($use_ssl ? NABU_HTTPSDOCS_FOLDER : NABU_HTTPDOCS_FOLDER);
                 $output .= $padding . "<VirtualHost " . $vhost['host']['nb_ip_ip'] . ':' . $vhost['host']['nb_server_host_port'] . ">\n";

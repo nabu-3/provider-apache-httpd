@@ -29,16 +29,19 @@ use \providers\apache\httpd\files\CApacheAbstractFile;
  * Class to manage nabu-3 Apache Standalone Config File
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.7
+ * @version 0.0.8
  * @package \providers\apache\httpd\files
  */
 class CApacheStandaloneFile extends CApacheAbstractFile
 {
+    /** @var CNabuServer $nb_server Server instance to build file. */
     private $nb_server;
+    /** @var CNabuSite $nb_site Site instance to build file. */
     private $nb_site;
 
     /**
      * Constructor.
+     * @param CApacheHTTPServer $apache_server Apache Server entity
      * @param CNabuServer $nb_server Server entity to configure file
      * @param CNabuSite $nb_site Site entity to configure file
      * @throws ENabuCoreException Throws this exception if param $nb_server is empty

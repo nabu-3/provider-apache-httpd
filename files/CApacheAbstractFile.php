@@ -26,7 +26,7 @@ use \providers\apache\httpd\CApacheHTTPServer;
  * Abstract class to manage all config files of Apache HTTP Server.
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.7
+ * @version 0.0.8
  * @package \providers\apache\httpd\files
  */
 class CApacheAbstractFile extends CNabuTextBuilder
@@ -70,14 +70,21 @@ class CApacheAbstractFile extends CNabuTextBuilder
              . "\n";
     }
 
-    protected function populateCommonDocs($padding, $commons_path)
+    /**
+     * Populates all subfolders in commondocs folder as Alias Apache primitives.
+     * @param string $padding Padding before each line
+     * @param string $commondocs Common Docs base path to be populated
+     * @return string Returns a well formed string of Apache primitives with all aliases or an empty string if
+     * the folder is empty.
+     */
+    protected function populateCommonDocs(string $padding, string $commondocs) : string
     {
         $output = '';
 
-        if (is_dir($commons_path)) {
-            $h = opendir($commons_path);
+        if (is_dir($commondocs)) {
+            $h = opendir($commondocs);
             while (($dir = readdir($h))) {
-                $folder = $commons_path . DIRECTORY_SEPARATOR . $dir;
+                $folder = $commondocs . DIRECTORY_SEPARATOR . $dir;
                 if ($dir !== '.' && $dir !== '..' && is_dir($folder)) {
                     $output .= "\n"
                             . $padding . "Alias /$dir \"$folder\"\n"
