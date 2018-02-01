@@ -93,6 +93,8 @@ class CApacheHostedFile extends CApacheAbstractFile
             $server_key = $this->nb_server->getKey();
             $runtime_path = $this->nb_server->getRuntimePath();
             $logs_path = $this->nb_server->getLogsPath();
+            $site_etc_path = CApacheHTTPServer::NABU_APACHE_ETC_PATH . DIRECTORY_SEPARATOR . $this->nb_site->getBasePath();
+            error_log($site_etc_path);
             $site_base_path = $this->nb_site->getVirtualHostPath($this->nb_server);
             $site_lib_path = $this->nb_site->getVirtualLibrariesPath($this->nb_server);
             $site_cache_path = $this->nb_site->getVirtualCachePath($this->nb_server);
@@ -131,17 +133,17 @@ class CApacheHostedFile extends CApacheAbstractFile
                             $output .= $padding . "        <IfModule mod_ssl.c>\n";
                             $output .= $padding . "                SSLEngine on\n";
                             $output .= $padding . "                SSLVerifyClient none\n";
-                            if (file_exists("$site_base_path/private/$site_key.crt")) {
-                                $output .= $padding . "                SSLCertificateFile $site_base_path/private/$site_key.crt\n";
+                            if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.crt')) {
+                                $output .= $padding . "                SSLCertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.crt\n";
                             }
-                            if (file_exists("$site_base_path/private/$site_key" . "_private.key")) {
-                                $output .= $padding . "                SSLCertificateKeyFile $site_base_path/private/$site_key" . "_private.key\n";
+                            if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.key')) {
+                                $output .= $padding . "                SSLCertificateKeyFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.key\n";
                             }
-                            if (file_exists("$site_base_path/private/$site_key" . "_intermediate.crt")) {
-                                $output .= $padding . "                SSLCertificateChainFile $site_base_path/private/$site_key" . "_intermediate.crt\n";
+                            if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_intermediate.crt')) {
+                                $output .= $padding . "                SSLCertificateChainFile $site_etc_path". DIRECTORY_SEPARATOR . "${site_key}_intermediate.crt\n";
                             }
-                            if (file_exists("$site_base_path/private/$site_key" . "_root.crt")) {
-                                $output .= $padding . "                SSLCACertificateFile $site_base_path/private/$site_key" . "_root.crt\n";
+                            if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_root.crt')) {
+                                $output .= $padding . "                SSLCACertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "${site_key}_root.crt\n";
                             }
                             $output .= $padding . "                SSLProxyEngine on\n";
                             $output .= $padding . "        </IfModule>\n";
@@ -201,17 +203,17 @@ class CApacheHostedFile extends CApacheAbstractFile
                     $output .= $padding . "        <IfModule mod_ssl.c>\n";
                     $output .= $padding . "                SSLEngine on\n";
                     $output .= $padding . "                SSLVerifyClient none\n";
-                    if (file_exists("$site_base_path/private/$site_key.crt")) {
-                        $output .= $padding . "                SSLCertificateFile $site_base_path/private/$site_key.crt\n";
+                    if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.crt')) {
+                        $output .= $padding . "                SSLCertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.crt\n";
                     }
-                    if (file_exists("$site_base_path/private/$site_key" . "_private.key")) {
-                        $output .= $padding . "                SSLCertificateKeyFile $site_base_path/private/$site_key" . "_private.key\n";
+                    if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.key')) {
+                        $output .= $padding . "                SSLCertificateKeyFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.key\n";
                     }
-                    if (file_exists("$site_base_path/private/$site_key" . "_intermediate.crt")) {
-                        $output .= $padding . "                SSLCertificateChainFile $site_base_path/private/$site_key" . "_intermediate.crt\n";
+                    if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_intermediate.crt')) {
+                        $output .= $padding . "                SSLCertificateChainFile $site_etc_path" . DIRECTORY_SEPARATOR . "${site_key}_intermediate.crt\n";
                     }
-                    if (file_exists("$site_base_path/private/$site_key" . "_root.crt")) {
-                        $output .= $padding . "                SSLCACertificateFile $site_base_path/private/$site_key" . "_root.crt\n";
+                    if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_root.crt')) {
+                        $output .= $padding . "                SSLCACertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "${site_key}_root.crt\n";
                     }
                     $output .= $padding . "                SSLProxyEngine on\n";
                     $output .= $padding . "        </IfModule>\n";
