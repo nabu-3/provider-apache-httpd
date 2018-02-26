@@ -425,7 +425,8 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         ) {
             ;
             if (($this->nb_server = CNabuServer::findByHostParams($addr, $port, $server_name)) === null) {
-                $this->nb_server = CNabuServer::findByDefaultHostParams($addr, $port, $server_name);
+                $nb_engine->errorLog("Server host not found $server_name:$port @$addr");
+                //$this->nb_server = CNabuServer::findByDefaultHostParams($addr, $port, $server_name);
                 $this->nb_server_invalid = true;
             } else {
                 $this->nb_server_invalid = false;
