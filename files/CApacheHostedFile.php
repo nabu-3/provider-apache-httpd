@@ -135,15 +135,23 @@ class CApacheHostedFile extends CApacheAbstractFile
                             $output .= $padding . "                SSLVerifyClient none\n";
                             if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.crt')) {
                                 $output .= $padding . "                SSLCertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.crt\n";
+                            } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'server.crt')) {
+                                $output .= $padding . "                SSLCertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "server.crt\n";
                             }
                             if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.key')) {
                                 $output .= $padding . "                SSLCertificateKeyFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.key\n";
+                            } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'server.key')) {
+                                $output .= $padding . "                SSLCertificateKeyFile $site_etc_path" . DIRECTORY_SEPARATOR . "server.key\n";
                             }
                             if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_intermediate.crt')) {
                                 $output .= $padding . "                SSLCertificateChainFile $site_etc_path". DIRECTORY_SEPARATOR . "${site_key}_intermediate.crt\n";
+                            } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'intermediate.crt')) {
+                                $output .= $padding . "                SSLCertificateChainFile $site_etc_path". DIRECTORY_SEPARATOR . "intermediate.crt\n";
                             }
                             if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_root.crt')) {
                                 $output .= $padding . "                SSLCACertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "${site_key}_root.crt\n";
+                            } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'ca.crt')) {
+                                $output .= $padding . "                SSLCACertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "ca.crt\n";
                             }
                             $output .= $padding . "                SSLProxyEngine on\n";
                             $output .= $padding . "        </IfModule>\n";
@@ -205,15 +213,23 @@ class CApacheHostedFile extends CApacheAbstractFile
                     $output .= $padding . "                SSLVerifyClient none\n";
                     if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.crt')) {
                         $output .= $padding . "                SSLCertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.crt\n";
+                    } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'server.crt')) {
+                        $output .= $padding . "                SSLCertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "server.crt\n";
                     }
                     if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '.key')) {
                         $output .= $padding . "                SSLCertificateKeyFile $site_etc_path" . DIRECTORY_SEPARATOR . "$site_key.key\n";
+                    } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'server.key')) {
+                        $output .= $padding . "                SSLCertificateKeyFile $site_etc_path" . DIRECTORY_SEPARATOR . "server.key\n";
                     }
                     if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_intermediate.crt')) {
                         $output .= $padding . "                SSLCertificateChainFile $site_etc_path" . DIRECTORY_SEPARATOR . "${site_key}_intermediate.crt\n";
+                    } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'intermediate.crt')) {
+                        $output .= $padding . "                SSLCertificateChainFile $site_etc_path" . DIRECTORY_SEPARATOR . "intermediate.crt\n";
                     }
                     if (file_exists($site_etc_path . DIRECTORY_SEPARATOR . $site_key . '_root.crt')) {
                         $output .= $padding . "                SSLCACertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "${site_key}_root.crt\n";
+                    } elseif (file_exists($site_etc_path . DIRECTORY_SEPARATOR . 'ca.crt')) {
+                        $output .= $padding . "                SSLCACertificateFile $site_etc_path" . DIRECTORY_SEPARATOR . "ca.crt\n";
                     }
                     $output .= $padding . "                SSLProxyEngine on\n";
                     $output .= $padding . "        </IfModule>\n";
