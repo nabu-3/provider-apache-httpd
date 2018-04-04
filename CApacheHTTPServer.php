@@ -314,15 +314,7 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $file = new CApacheClusteredFile($this, $this->nb_server, $nb_site);
         $file->create();
         $path = self::NABU_APACHE_ETC_PATH . DIRECTORY_SEPARATOR . $nb_site->getBasePath();
-        /*
-        $path = $this->nb_server->getVirtualHostsPath()
-                  . DIRECTORY_SEPARATOR
-                  . $nb_site->getBasePath()
-                  . NABU_VHOST_CONFIG_FOLDER
-                  . DIRECTORY_SEPARATOR
-                  . $this->nb_server->getKey()
-        ;
-        */
+
         if (!is_dir($path)) {
             mkdir($path, 0755, true);
         }

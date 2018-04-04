@@ -197,7 +197,7 @@ class CApacheHostedFile extends CApacheAbstractFile
                         . $nb_cluster_user_group->getOSNick()
                         . "\n";
 
-                if ($admin_user !== null) {
+                if ($admin_user !== null && strlen($admin_user->getEmail()) > 0) {
                     $output .= $padding . "        ServerAdmin \"" . $admin_user->getEmail() . "\"\n";
                 }
 
