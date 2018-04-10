@@ -162,7 +162,7 @@ class CApacheHostedFile extends CApacheAbstractFile
                         }
                         $output .= $padding . "\n";
                         $output .= $padding . "        RewriteEngine on\n";
-                        $output .= $padding . "        RewriteRule ^(.*)$ ".($use_ssl ? 'https:://' : 'http://').$server_name."/$1?%{QUERY_STRING} [L]\n";
+                        $output .= $padding . "        RewriteRule ^(.*)$ ".($use_ssl ? 'https:://' : 'http://').$server_name."/$1?%{QUERY_STRING} [R=301,L]\n";
 
                         $output .= $padding . "</VirtualHost>\n";
                     }
