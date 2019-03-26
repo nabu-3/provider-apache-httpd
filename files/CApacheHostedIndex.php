@@ -1,6 +1,7 @@
 <?php
 
-/*  Copyright 2009-2011 Rafael Gutierrez Martinez
+/** @license
+ *  Copyright 2009-2011 Rafael Gutierrez Martinez
  *  Copyright 2012-2013 Welma WEB MKT LABS, S.L.
  *  Copyright 2014-2016 Where Ideas Simply Come True, S.L.
  *  Copyright 2017 nabu-3 Group
@@ -26,7 +27,7 @@ use nabu\data\site\CNabuSiteList;
 /**
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.8
+ * @version 0.0.9
  * @package \providers\apache\httpd\files
  */
 class CApacheHostedIndex extends CApacheAbstractFile
@@ -59,30 +60,17 @@ class CApacheHostedIndex extends CApacheAbstractFile
 
     protected function getContent(string $padding = '') : string
     {
-        $http_server = $this->getHTTPServer();
-        $nb_server = $http_server->getServer();
-        $vhosts_path = $nb_server->getVirtualHostsPath();
-
         $output = '';
 
         $this->index_list->iterate(
-            function ($site_key, $nb_site) use (&$output, $nb_server, $padding)
+            function ($site_key, $nb_site) use (&$output, $padding)
             {
                 if ($nb_site->isPublished()) {
                     $site_path = CApacheHTTPServer::NABU_APACHE_ETC_PATH
                                . DIRECTORY_SEPARATOR . $nb_site->getBasePath()
                                . DIRECTORY_SEPARATOR . NABU_VHOST_CONFIG_FILENAME;
-                    /*
-                    $site_path = $nb_server->getVirtualHostsPath()
-                               . $nb_site->getBasePath()
-                               . NABU_VHOST_CONFIG_FOLDER
-                               . DIRECTORY_SEPARATOR
-                               . $nb_server->getKey()
-                               . DIRECTORY_SEPARATOR
-                               . NABU_VHOST_CONFIG_FILENAME;
-                    */
                     if (file_exists($site_path)) {
-                        $output .= $padding . "# Host: " . $nb_site->getTranslation($nb_site->getDefaultLanguageId())->getName() . "\n";
+                        $output .= $padding . "# Host: [$site_key] " . $nb_site->getTranslation($nb_site->getDefaultLanguageId())->getName() . "\n";
                         $output .= $padding . "Include \"$site_path\"\n";
                     }
                 }

@@ -1,6 +1,7 @@
 <?php
 
-/*  Copyright 2009-2011 Rafael Gutierrez Martinez
+/** @license
+ *  Copyright 2009-2011 Rafael Gutierrez Martinez
  *  Copyright 2012-2013 Welma WEB MKT LABS, S.L.
  *  Copyright 2014-2016 Where Ideas Simply Come True, S.L.
  *  Copyright 2017 nabu-3 Group
@@ -30,7 +31,7 @@ use \providers\apache\httpd\files\CApacheAbstractFile;
  * Class to manage nabu-3 Apache Standalone Config File
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.8
+ * @version 0.0.9
  * @package \providers\apache\httpd\files
  */
 class CApacheStandaloneFile extends CApacheAbstractFile
@@ -108,9 +109,6 @@ class CApacheStandaloneFile extends CApacheAbstractFile
                  . $padding . "</Directory>\n"
         ;
 
-        $output .= $this->populateCommonDocs($padding, $site_commons);
-
-
-        return $output;
+        return $output . $this->populateCommonDocs($padding, $site_commons);
     }
 }
