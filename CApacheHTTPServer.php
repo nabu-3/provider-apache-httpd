@@ -26,6 +26,8 @@ use nabu\core\CNabuOS;
 use nabu\core\exceptions\ENabuCoreException;
 use nabu\data\site\CNabuSite;
 use nabu\data\site\CNabuSiteList;
+use nabu\http\CNabuHTTPFileSystem;
+
 use nabu\http\adapters\CNabuHTTPServerAdapter;
 use providers\apache\httpd\files\CApacheHostedFile;
 use providers\apache\httpd\files\CApacheClusteredIndex;
@@ -39,7 +41,6 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
  * @since 0.0.1
  * @version 0.0.9
  * @package \providers\apache\httpd
- * @todo Create new abstract and interface methods
  */
 class CApacheHTTPServer extends CNabuHTTPServerAdapter
 {
@@ -57,6 +58,16 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     private $apache_config_path = false;
     /** @var string $php_module Name of PHP Module for Apache detected. */
     private $php_module = false;
+
+    public function recognizeSoftware()
+    {
+        throw new \LogicException('Not implemented'); // TODO
+    }
+
+    protected function createFileSystem()
+    {
+        return new CNabuHTTPFileSystem();
+    }
 
     /**
      * Locates Apache HTTP Server instance running in the S.O.
