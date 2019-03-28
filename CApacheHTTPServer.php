@@ -23,17 +23,9 @@ namespace providers\apache\httpd;
 
 use nabu\cli\CNabuShell;
 use nabu\core\CNabuOS;
-use nabu\core\CNabuEngine;
 use nabu\core\exceptions\ENabuCoreException;
-use nabu\core\utils\CNabuURL;
-use nabu\data\cluster\CNabuServer;
-use nabu\data\cluster\CNabuServerHost;
-use nabu\data\customer\CNabuCustomer;
-use nabu\data\domain\CNabuDomainZone;
-use nabu\data\domain\CNabuDomainZoneHost;
 use nabu\data\site\CNabuSite;
 use nabu\data\site\CNabuSiteList;
-use nabu\data\site\CNabuSiteAlias;
 use nabu\http\adapters\CNabuHTTPServerAdapter;
 use providers\apache\httpd\files\CApacheHostedFile;
 use providers\apache\httpd\files\CApacheClusteredIndex;
@@ -47,6 +39,7 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
  * @since 0.0.1
  * @version 0.0.9
  * @package \providers\apache\httpd
+ * @todo Create new abstract and interface methods
  */
 class CApacheHTTPServer extends CNabuHTTPServerAdapter
 {
@@ -65,7 +58,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     /** @var string $php_module Name of PHP Module for Apache detected. */
     private $php_module = false;
 
-    public function locateApacheServer()
+    /**
+     * Locates Apache HTTP Server instance running in the S.O.
+     * @return bool Returns true if success.
+     */
+    public function locateApacheServer() : bool
     {
         if ($this->getApacheCtl()) {
             $this->getApacheInfo();
@@ -76,6 +73,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $this->apachectl !== false && $this->apache_config_path !== false;
     }
 
+    /**
+     * Locates the Apache Control Application full path installed in the S.O.
+     * @return string|false Returns the full path if success or false if error.
+     */
     public function getApacheCtl()
     {
         if ($this->apachectl === false) {
@@ -90,6 +91,9 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $this->apachectl;
     }
 
+    /**
+     * Gets Apache Information about installed Apache HTTP Server.
+     */
     public function getApacheInfo()
     {
         if ($this->apachectl !== false) {
@@ -101,18 +105,28 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         }
     }
 
-    private function parseApacheInfo($data)
+    /**
+     * Parse Apache Information lines to get valid values.
+     * @param array|null $data Array of lines to parse.
+     */
+    private function parseApacheInfo(array $data = null)
     {
         $this->apache_info = null;
 
         if (is_array($data) && count($data) > 0) {
             foreach ($data as $line) {
-                $this->interpretApacheInfoData($line) || $this->interpretApacheInfoVariable($line);
+                $this->interpretApacheInfoData($line) ||
+                $this->interpretApacheInfoVariable($line);
             }
         }
     }
 
-    private function interpretApacheInfoData($line)
+    /**
+     * Interprets a line of Apache Information to discover valid data and store it in $apache_info array.
+     * @param string $line Line Information to be interpreted.
+     * @return bool Return true if success.
+     */
+    private function interpretApacheInfoData(string $line) : bool
     {
         $retval = false;
         $parts = preg_split('/:\s+/', $line, 2);
@@ -153,6 +167,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $retval;
     }
 
+    /**
+     * Get the Apache Instances Path.
+     * @return string|false Returns the path if exists or false elsewhere.
+     */
     public function getApacheInstancesPath()
     {
         if ($this->apache_config_path === false &&
@@ -180,7 +198,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $this->apache_config_path;
     }
 
-    private function interpretApacheInfoVariable($line)
+    /**
+     * Interpret Apache Infromation Variable line.
+     * @param string $line Line of Intormation to be interpreted.
+     */
+    private function interpretApacheInfoVariable(string $line)
     {
         $content = preg_split('/^\\s+-D\\s+/', $line, 2);
         if (count($content) === 2) {
@@ -193,7 +215,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         }
     }
 
-    public function getServerVersion()
+    /**
+     * Gets the Apache HTTP Server Version.
+     * @return string Returns the version string or 'Unknown' if no version is available.
+     */
+    public function getServerVersion() : string
     {
         return (is_array($this->apache_info) && array_key_exists('server-version', $this->apache_info))
                 ? $this->apache_info['server-version']
@@ -201,6 +227,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         ;
     }
 
+    /**
+     * Gets the PHP Module Apache name depending of installed version of PHP (5 or 7).
+     * @return string|false Returns the string name if exists or false elsewhere.
+     */
     public function getPHPModule()
     {
         if (!$this->php_module) {
@@ -220,7 +250,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $this->php_module;
     }
 
-    public function createStandaloneConfiguration()
+    /**
+     * Creates the Standalone Configuration files.
+     * @return bool Return true if success.
+     */
+    public function createStandaloneConfiguration() : bool
     {
         $retval = false;
 
@@ -234,7 +268,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $retval;
     }
 
-    public function createHostedConfiguration()
+    /**
+     * Creates the Hosted Configuration files.
+     * @return bool Return true if success.
+     */
+    public function createHostedConfiguration() : bool
     {
         $retval = false;
 
@@ -254,6 +292,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $retval;
     }
 
+    /**
+     * Creates the Clustered Configuration files.
+     * @return bool Return true if success.
+     */
     public function createClusteredConfiguration()
     {
         $retval = false;
@@ -275,6 +317,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $retval;
     }
 
+    /**
+     * Create Hosted hosts index file.
+     * @param CNabuSiteList $index_list List of Sites to be listed.
+     */
     private function createHostedIndex(CNabuSiteList $index_list)
     {
         $index = new CApacheHostedIndex($this, $index_list);
@@ -282,6 +328,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $index->exportToFile($this->apache_config_path . DIRECTORY_SEPARATOR . self::APACHE_CONFIG_FILENAME);
     }
 
+    /**
+     * Create Clustered hosts index file.
+     * @param CNabuSiteList $index_list List of Sites to be listed.
+     */
     private function createClusteredIndex(CNabuSiteList $index_list)
     {
         $index = new CApacheClusteredIndex($this, $index_list);
@@ -289,6 +339,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $index->exportToFile($this->apache_config_path . DIRECTORY_SEPARATOR . self::APACHE_CONFIG_FILENAME);
     }
 
+    /**
+     * Create Hosted per Site file configuration.
+     * @param CNabuSite $nb_site Site to create configuration.
+     */
     private function createHostedFile(CNabuSite $nb_site)
     {
         $file = new CApacheHostedFile($this, $this->nb_server, $nb_site);
@@ -310,6 +364,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $file->exportToFile($filename);
     }
 
+    /**
+     * Create Clustered per Site file configuration.
+     * @param CNabuSite $nb_site Site to create configuration.
+     */
     private function createClusteredFile(CNabuSite $nb_site)
     {
         $file = new CApacheClusteredFile($this, $this->nb_server, $nb_site);
@@ -327,25 +385,32 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     }
 
     /**
+     * Validates a path to ensure that it exists and is available. If not exists tries to create it.
+     * @param string $path Path to validate.
+     * @return string Returns the path for convenience.
+     * @throws ENabuCoreException Raises an exception if the path does not exists.
+     */
+    private function validatePath(string $path) : string
+    {
+        if (!is_dir($path) && !mkdir($path, 0755, true)) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($path));
+        }
+
+        return $path;
+    }
+
+    /**
      * Create Site Folders for the requested Site.
      * @param CNabuSite $nb_site Site instance to create folders.
      * @return bool Returns true if all required folders exists.
      * @throws ENabuCoreException Raises an exception if a folder cannot be available.
+     * @todo Refactor this method to use CNabuHTTPFileSystem
      */
-    public function createSiteFolders(CNabuSite $nb_site)
+    public function createSiteFolders(CNabuSite $nb_site) : bool
     {
-        $vhosts_path = $this->nb_server->getVirtualHostsPath();
-        if (!is_dir($vhosts_path) && !mkdir($vhosts_path, 0755, true)) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vhosts_path));
-        }
-        $vlib_path = $this->nb_server->getVirtualLibrariesPath();
-        if (!is_dir($vlib_path) && !mkdir($vlib_path, 0755, true)) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vlib_path));
-        }
-        $vcache_path = $this->nb_server->getVirtualCachePath();
-        if (!is_dir($vcache_path) && !mkdir($vcache_path, 0755, true)) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vcache_path));
-        }
+        $vhosts_path = $this->validatePath($this->nb_server->getVirtualHostsPath());
+        $vlib_path = $this->validatePath($this->nb_server->getVirtualLibrariesPath());
+        $vcache_path = $this->validatePath($this->nb_server->getVirtualCachePath());
 
         $nb_cluster_user = $nb_site->getClusterUser();
         if ($nb_cluster_user === null) {
