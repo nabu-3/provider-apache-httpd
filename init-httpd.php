@@ -19,6 +19,8 @@
  *  limitations under the License.
  */
 
+use providers\apache\httpd\CApacheHTTPDManager;
+
 /**
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.7
@@ -35,3 +37,5 @@ define('APACHE_HTTPD_PROVIDER_PATH', dirname(__FILE__));
 if (!defined('APACHE_HTTPD_SYS_USER')) {
     define('APACHE_HTTPD_SYS_USER', 'apache');
 }
+
+$nb_engine->registerProviderManager(new CApacheHTTPDManager());

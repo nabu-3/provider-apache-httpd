@@ -19,7 +19,7 @@
  *  limitations under the License.
  */
 
-namespace providers\apache\httpd;
+namespace providers\apache\httpd\servers;
 
 use nabu\cli\CNabuShell;
 use nabu\core\CNabuOS;
@@ -29,6 +29,8 @@ use nabu\data\site\CNabuSiteList;
 use nabu\http\CNabuHTTPFileSystem;
 
 use nabu\http\adapters\CNabuHTTPServerAdapter;
+use nabu\http\interfaces\INabuHTTPFileSystem;
+
 use providers\apache\httpd\files\CApacheHostedFile;
 use providers\apache\httpd\files\CApacheClusteredIndex;
 use providers\apache\httpd\files\CApacheHostedIndex;
@@ -40,9 +42,9 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
  * @version 0.0.9
- * @package \providers\apache\httpd
+ * @package \providers\apache\httpd\servers
  */
-class CApacheHTTPServer extends CNabuHTTPServerAdapter
+class CApacheHTTPServerInterface extends CNabuHTTPServerAdapter
 {
     /** @var string APACHE_CONFIG_FILENAME Apache main config filename for nabu-3 */
     const APACHE_CONFIG_FILENAME = 'nabu-3.conf';
@@ -59,12 +61,14 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     /** @var string $php_module Name of PHP Module for Apache detected. */
     private $php_module = false;
 
-    public function recognizeSoftware()
+    public function recognizeSoftware(): bool
     {
-        throw new \LogicException('Not implemented'); // TODO
+        $software = $this->getServerSoftware();
+
+        return preg_match('/^Apache\/2\.[234]\.[0-9]+\s/', $software);
     }
 
-    protected function createFileSystem()
+    protected function createFileSystem(): INabuHTTPFileSystem
     {
         return new CNabuHTTPFileSystem();
     }
