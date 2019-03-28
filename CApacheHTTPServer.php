@@ -1,6 +1,7 @@
 <?php
 
-/*  Copyright 2009-2011 Rafael Gutierrez Martinez
+/** @license
+ *  Copyright 2009-2011 Rafael Gutierrez Martinez
  *  Copyright 2012-2013 Welma WEB MKT LABS, S.L.
  *  Copyright 2014-2016 Where Ideas Simply Come True, S.L.
  *  Copyright 2017 nabu-3 Group
@@ -22,17 +23,9 @@ namespace providers\apache\httpd;
 
 use nabu\cli\CNabuShell;
 use nabu\core\CNabuOS;
-use nabu\core\CNabuEngine;
 use nabu\core\exceptions\ENabuCoreException;
-use nabu\core\utils\CNabuURL;
-use nabu\data\cluster\CNabuServer;
-use nabu\data\cluster\CNabuServerHost;
-use nabu\data\customer\CNabuCustomer;
-use nabu\data\domain\CNabuDomainZone;
-use nabu\data\domain\CNabuDomainZoneHost;
 use nabu\data\site\CNabuSite;
 use nabu\data\site\CNabuSiteList;
-use nabu\data\site\CNabuSiteAlias;
 use nabu\http\adapters\CNabuHTTPServerAdapter;
 use providers\apache\httpd\files\CApacheHostedFile;
 use providers\apache\httpd\files\CApacheClusteredIndex;
@@ -44,8 +37,9 @@ use providers\apache\httpd\files\CApacheStandaloneFile;
  * Main class to manage Apache HTTP Server
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.8
+ * @version 0.0.9
  * @package \providers\apache\httpd
+ * @todo Create new abstract and interface methods
  */
 class CApacheHTTPServer extends CNabuHTTPServerAdapter
 {
@@ -64,7 +58,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     /** @var string $php_module Name of PHP Module for Apache detected. */
     private $php_module = false;
 
-    public function locateApacheServer()
+    /**
+     * Locates Apache HTTP Server instance running in the S.O.
+     * @return bool Returns true if success.
+     */
+    public function locateApacheServer() : bool
     {
         if ($this->getApacheCtl()) {
             $this->getApacheInfo();
@@ -75,22 +73,27 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $this->apachectl !== false && $this->apache_config_path !== false;
     }
 
+    /**
+     * Locates the Apache Control Application full path installed in the S.O.
+     * @return string|false Returns the full path if success or false if error.
+     */
     public function getApacheCtl()
     {
         if ($this->apachectl === false) {
             $shell = new CNabuShell();
             $response = array();
-            if ($shell->exec('whereis apachectl', null, $response)) {
-                if (count($response) === 1) {
-                    $parts = preg_split('/\\s/', preg_replace('/^apachectl: /', '', $response[0]));
-                    $this->apachectl = $parts[0];
-                }
+            if ($shell->exec('whereis apachectl', null, $response) && count($response) === 1) {
+                $parts = preg_split('/\\s/', preg_replace('/^apachectl: /', '', $response[0]));
+                $this->apachectl = $parts[0];
             }
         }
 
         return $this->apachectl;
     }
 
+    /**
+     * Gets Apache Information about installed Apache HTTP Server.
+     */
     public function getApacheInfo()
     {
         if ($this->apachectl !== false) {
@@ -102,18 +105,28 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         }
     }
 
-    private function parseApacheInfo($data)
+    /**
+     * Parse Apache Information lines to get valid values.
+     * @param array|null $data Array of lines to parse.
+     */
+    private function parseApacheInfo(array $data = null)
     {
         $this->apache_info = null;
 
         if (is_array($data) && count($data) > 0) {
             foreach ($data as $line) {
-                $this->interpretApacheInfoData($line) || $this->interpretApacheInfoVariable($line);
+                $this->interpretApacheInfoData($line) ||
+                $this->interpretApacheInfoVariable($line);
             }
         }
     }
 
-    private function interpretApacheInfoData($line)
+    /**
+     * Interprets a line of Apache Information to discover valid data and store it in $apache_info array.
+     * @param string $line Line Information to be interpreted.
+     * @return bool Return true if success.
+     */
+    private function interpretApacheInfoData(string $line) : bool
     {
         $retval = false;
         $parts = preg_split('/:\s+/', $line, 2);
@@ -147,12 +160,17 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
                     $this->apache_info['server-mpm-forked'] = trim($parts[1]);
                     $retval = true;
                     break;
+                default:
             }
         }
 
         return $retval;
     }
 
+    /**
+     * Get the Apache Instances Path.
+     * @return string|false Returns the path if exists or false elsewhere.
+     */
     public function getApacheInstancesPath()
     {
         if ($this->apache_config_path === false &&
@@ -180,7 +198,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $this->apache_config_path;
     }
 
-    private function interpretApacheInfoVariable($line)
+    /**
+     * Interpret Apache Infromation Variable line.
+     * @param string $line Line of Intormation to be interpreted.
+     */
+    private function interpretApacheInfoVariable(string $line)
     {
         $content = preg_split('/^\\s+-D\\s+/', $line, 2);
         if (count($content) === 2) {
@@ -193,7 +215,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         }
     }
 
-    public function getServerVersion()
+    /**
+     * Gets the Apache HTTP Server Version.
+     * @return string Returns the version string or 'Unknown' if no version is available.
+     */
+    public function getServerVersion() : string
     {
         return (is_array($this->apache_info) && array_key_exists('server-version', $this->apache_info))
                 ? $this->apache_info['server-version']
@@ -201,6 +227,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         ;
     }
 
+    /**
+     * Gets the PHP Module Apache name depending of installed version of PHP (5 or 7).
+     * @return string|false Returns the string name if exists or false elsewhere.
+     */
     public function getPHPModule()
     {
         if (!$this->php_module) {
@@ -213,13 +243,18 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
                 case '7':
                     $this->php_module = 'php7_module';
                     break;
+                default:
             }
         }
 
         return $this->php_module;
     }
 
-    public function createStandaloneConfiguration()
+    /**
+     * Creates the Standalone Configuration files.
+     * @return bool Return true if success.
+     */
+    public function createStandaloneConfiguration() : bool
     {
         $retval = false;
 
@@ -233,7 +268,11 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $retval;
     }
 
-    public function createHostedConfiguration()
+    /**
+     * Creates the Hosted Configuration files.
+     * @return bool Return true if success.
+     */
+    public function createHostedConfiguration() : bool
     {
         $retval = false;
 
@@ -253,6 +292,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $retval;
     }
 
+    /**
+     * Creates the Clustered Configuration files.
+     * @return bool Return true if success.
+     */
     public function createClusteredConfiguration()
     {
         $retval = false;
@@ -274,6 +317,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         return $retval;
     }
 
+    /**
+     * Create Hosted hosts index file.
+     * @param CNabuSiteList $index_list List of Sites to be listed.
+     */
     private function createHostedIndex(CNabuSiteList $index_list)
     {
         $index = new CApacheHostedIndex($this, $index_list);
@@ -281,6 +328,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $index->exportToFile($this->apache_config_path . DIRECTORY_SEPARATOR . self::APACHE_CONFIG_FILENAME);
     }
 
+    /**
+     * Create Clustered hosts index file.
+     * @param CNabuSiteList $index_list List of Sites to be listed.
+     */
     private function createClusteredIndex(CNabuSiteList $index_list)
     {
         $index = new CApacheClusteredIndex($this, $index_list);
@@ -288,6 +339,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $index->exportToFile($this->apache_config_path . DIRECTORY_SEPARATOR . self::APACHE_CONFIG_FILENAME);
     }
 
+    /**
+     * Create Hosted per Site file configuration.
+     * @param CNabuSite $nb_site Site to create configuration.
+     */
     private function createHostedFile(CNabuSite $nb_site)
     {
         $file = new CApacheHostedFile($this, $this->nb_server, $nb_site);
@@ -309,6 +364,10 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         $file->exportToFile($filename);
     }
 
+    /**
+     * Create Clustered per Site file configuration.
+     * @param CNabuSite $nb_site Site to create configuration.
+     */
     private function createClusteredFile(CNabuSite $nb_site)
     {
         $file = new CApacheClusteredFile($this, $this->nb_server, $nb_site);
@@ -326,25 +385,32 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
     }
 
     /**
+     * Validates a path to ensure that it exists and is available. If not exists tries to create it.
+     * @param string $path Path to validate.
+     * @return string Returns the path for convenience.
+     * @throws ENabuCoreException Raises an exception if the path does not exists.
+     */
+    private function validatePath(string $path) : string
+    {
+        if (!is_dir($path) && !mkdir($path, 0755, true)) {
+            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($path));
+        }
+
+        return $path;
+    }
+
+    /**
      * Create Site Folders for the requested Site.
      * @param CNabuSite $nb_site Site instance to create folders.
      * @return bool Returns true if all required folders exists.
      * @throws ENabuCoreException Raises an exception if a folder cannot be available.
+     * @todo Refactor this method to use CNabuHTTPFileSystem
      */
-    public function createSiteFolders(CNabuSite $nb_site)
+    public function createSiteFolders(CNabuSite $nb_site) : bool
     {
-        $vhosts_path = $this->nb_server->getVirtualHostsPath();
-        if (!is_dir($vhosts_path) && !mkdir($vhosts_path, 0755, true)) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vhosts_path));
-        }
-        $vlib_path = $this->nb_server->getVirtualLibrariesPath();
-        if (!is_dir($vlib_path) && !mkdir($vlib_path, 0755, true)) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vlib_path));
-        }
-        $vcache_path = $this->nb_server->getVirtualCachePath();
-        if (!is_dir($vcache_path) && !mkdir($vcache_path, 0755, true)) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_HOST_PATH_NOT_FOUND, array($vcache_path));
-        }
+        $vhosts_path = $this->validatePath($this->nb_server->getVirtualHostsPath());
+        $vlib_path = $this->validatePath($this->nb_server->getVirtualLibrariesPath());
+        $vcache_path = $this->validatePath($this->nb_server->getVirtualCachePath());
 
         $nb_cluster_user = $nb_site->getClusterUser();
         if ($nb_cluster_user === null) {
@@ -386,413 +452,5 @@ class CApacheHTTPServer extends CNabuHTTPServerAdapter
         }
 
         return true;
-    }
-
-    public function locateRunningConfiguration()
-    {
-        if ($this->nb_server === null) {
-            $this->locateNabuServer();
-        }
-
-        $this->locateCustomer();
-
-        if ($this->nb_site === null) {
-            $this->locateNabuSite();
-        }
-
-        if ($this->nb_domain_zone === null) {
-            $this->locateNabuDomainZone();
-        }
-    }
-
-    private function locateNabuServer()
-    {
-        $nb_engine = CNabuEngine::getEngine();
-
-        $this->nb_server_host = null;
-
-        if (($addr = $this->getServerAddress()) &&
-            ($port = $this->getServerPort()) &&
-            ($server_name = $this->getServerName())
-        ) {
-            ;
-            if (($this->nb_server = CNabuServer::findByHostParams($addr, $port, $server_name)) === null) {
-                $nb_engine->errorLog("Server host not found $server_name:$port @$addr");
-                //$this->nb_server = CNabuServer::findByDefaultHostParams($addr, $port, $server_name);
-                $this->nb_server_invalid = true;
-            } else {
-                $this->nb_server_invalid = false;
-            }
-            if ($this->nb_server === null) {
-                throw new ENabuCoreException(
-                    ENabuCoreException::ERROR_SERVER_NOT_FOUND, array($server_name, $addr, $port));
-            }
-
-            $this->nb_server_host = new CNabuServerHost($this->nb_server);
-            if ($this->nb_server_host->isNew()) {
-                throw new ENabuCoreException(
-                    ENabuCoreException::ERROR_SERVER_HOST_NOT_FOUND, array($addr, $port));
-            }
-            $nb_engine->traceLog(
-                "Server",
-                "$addr:$port [" . $this->nb_server->getId() . ',' . $this->nb_server_host->getId() . ']'
-            );
-        } else {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_SERVER_HOST_MISCONFIGURED);
-        }
-
-        return $this->nb_server;
-    }
-
-    private function locateCustomer()
-    {
-        $nb_engine = CNabuEngine::getEngine();
-        $nb_customer = $nb_engine->getCustomer();
-
-        if ($nb_customer === null && $this->nb_server->contains(NABU_CUSTOMER_FIELD_ID)) {
-            $nb_customer = new CNabuCustomer($this->nb_server->getValue(NABU_CUSTOMER_FIELD_ID));
-            if ($nb_customer->isFetched()) {
-                $nb_engine->setCustomer($nb_customer);
-            }
-        }
-    }
-
-    private function locateNabuDomainZone()
-    {
-        $nb_engine = CNabuEngine::getEngine();
-
-        if ($this->nb_server->contains(NABU_DOMAIN_ZONE_FIELD_ID)) {
-            $this->nb_domain_zone = new CNabuDomainZone($this->nb_server);
-        } elseif ($this->nb_site->contains(NABU_DOMAIN_ZONE_FIELD_ID)) {
-            $this->nb_domain_zone = new CNabuDomainZone($this->nb_site);
-        } else {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_DOMAIN_ZONE_NOT_FOUND);
-        }
-
-        if ($this->nb_server->contains(NABU_DOMAIN_ZONE_HOST_FIELD_ID)) {
-            $this->nb_domain_zone_host = new CNabuDomainZoneHost($this->nb_server);
-        } elseif ($this->nb_site->contains(NABU_DOMAIN_ZONE_HOST_FIELD_ID)) {
-            $this->nb_domain_zone_host = new CNabuDomainZoneHost($this->nb_site);
-        }
-
-        if ($this->nb_domain_zone_host !== null) {
-            if ($this->nb_domain_zone !== null) {
-                $this->nb_domain_zone_host->setDomainZone($this->nb_domain_zone);
-            }
-            if ($this->nb_site_alias !== null) {
-                $this->nb_site_alias->setDomainZoneHost($this->nb_domain_zone_host);
-            }
-        }
-    }
-
-    private function locateNabuSite()
-    {
-        $nb_engine = CNabuEngine::getEngine();
-
-        $this->nb_site_alias_force_default = false;
-
-        if ($this->nb_server->contains(NABU_SITE_FIELD_ID)) {
-            $this->nb_site = $nb_engine->getCustomer()->getSite($this->nb_server);
-        } elseif (($server_name = $this->getServerName())) {
-            $this->nb_site = $nb_engine->getCustomer()->getSiteByAlias($server_name);
-        }
-
-        if ($this->nb_site === null || !$this->nb_site->isFetched()) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_SITE_NOT_FOUND);
-        } elseif (!$this->nb_site->isPublished()) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_SITE_NOT_PUBLISHED, $this->nb_site->getId());
-        }
-
-        if ($this->nb_server->contains(NABU_SITE_ALIAS_FIELD_ID)) {
-            $this->nb_site_alias = new CNabuSiteAlias($this->nb_server);
-        } elseif ($this->nb_site->contains(NABU_SITE_ALIAS_FIELD_ID)) {
-            $this->nb_site_alias = new CNabuSiteAlias($this->nb_site);
-        }
-
-        if ($this->nb_site_alias === null || !$this->nb_site_alias->isFetched()) {
-            throw new ENabuCoreException(ENabuCoreException::ERROR_SITE_ALIAS_NOT_FOUND);
-        }
-
-        $this->nb_site->setAlias($this->nb_site_alias);
-
-        $nb_engine->traceLog("Site", $this->nb_site->getId());
-        $nb_engine->traceLog("Site Alias", $this->nb_site_alias->getId());
-    }
-
-    public function locateRemoteAddress()
-    {
-        $remote_ip = filter_input(INPUT_SERVER, 'HTTP_X_FORWARDED_FOR', false);
-        if (!$remote_ip) {
-            $remote_ip = filter_input(INPUT_SERVER, 'REMOTE_ADDR', false);
-        }
-
-        return $remote_ip;
-    }
-
-    public function getAcceptedMimetypes() {
-
-        if (array_key_exists('HTTP_ACCEPT', $_SERVER)) {
-            $mimetypes = preg_split("/(\s*,\s*)/", filter_input(INPUT_SERVER, 'HTTP_ACCEPT'));
-            if (count($mimetypes) > 0) {
-                $list = array();
-                foreach ($mimetypes as $mimetype) {
-                    $attrs = $this->parseAcceptedMimetype($mimetype);
-                    if (is_array($attrs)) {
-                        $list[$attrs['mimetype']] = $attrs;
-                    }
-                }
-            }
-        }
-
-        return isset($list) && count($list) > 0 ? $list : null;
-    }
-
-    private function parseAcceptedMimetype($mimetype)
-    {
-        $retval = false;
-
-        $parts = preg_split("/(\s*;\s*)/", $mimetype);
-        switch (count($parts)) {
-            case 1:
-                $retval = array (
-                    'mimetype' => $parts[0],
-                    'q' => 1
-                );
-                break;
-            case 2:
-                $retval = array (
-                    'mimetype' => $parts[0],
-                    'q' => floatval(substr($parts[1], 2))
-                );
-        }
-
-        return $retval;
-    }
-
-    public function getAcceptedLanguages() {
-
-        if (array_key_exists('HTTP_ACCEPT_LANGUAGE', $_SERVER)) {
-            $languages = preg_split("/(\s*,\s*)/", filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE'));
-            if (count($languages) > 0) {
-                $list = array();
-                foreach ($languages as $language) {
-                    $attrs = $this->parseAcceptedLanguage($language);
-                    if (is_array($attrs)) {
-                        $list[$attrs['language']] = $attrs;
-                    }
-                }
-            }
-        }
-
-        return isset($list) && count($list) > 0 ? $list : null;
-    }
-
-    private function parseAcceptedLanguage($language)
-    {
-        $retval = false;
-
-        $parts = preg_split("/(\s*;\s*)/", $language);
-        switch (count($parts)) {
-            case 1:
-                $retval = array (
-                    'language' => $parts[0],
-                    'q' => 1
-                );
-                break;
-            case 2:
-                $retval = array (
-                    'language' => $parts[0],
-                    'q' => floatval(substr($parts[1], 2))
-                );
-        }
-
-        return $retval;
-    }
-
-    public function getContentLength()
-    {
-        return (array_key_exists('CONTENT_LENGTH', $_SERVER) ? (int)$_SERVER['CONTENT_LENGTH'] : 0);
-    }
-
-    public function getContentType()
-    {
-        return (array_key_exists('CONTENT_TYPE', $_SERVER) ? $_SERVER['CONTENT_TYPE'] : null);
-    }
-
-    public function getReferer() {
-
-        $referer = null;
-
-        if (array_key_exists('HTTP_REFERER', $_SERVER)) {
-            $referer = new CNabuURL(filter_input(INPUT_SERVER, 'HTTP_REFERER'));
-            if (!$referer->isValid()) {
-                $referer = null;
-            }
-        }
-
-        return $referer;
-    }
-
-    public function getOrigin()
-    {
-        return filter_input(INPUT_SERVER, 'HTTP_ORIGIN');
-    }
-
-    public function getContextDocumentRoot()
-    {
-        return filter_input(INPUT_SERVER, 'CONTEXT_DOCUMENT_ROOT');
-    }
-
-    public function getContextPrefix()
-    {
-        return filter_input(INPUT_SERVER, 'CONTEXT_PREFIX');
-    }
-
-    public function getDocumentRoot()
-    {
-        return filter_input(INPUT_SERVER, 'DOCUMENT_ROOT');
-    }
-
-    public function getGatewayInterface()
-    {
-        return filter_input(INPUT_SERVER, 'GATEWAY_INTERFACE');
-    }
-
-    public function getHTTPAccept()
-    {
-        return filter_input(INPUT_SERVER, 'HTTP_ACCEPT');
-    }
-
-    public function getHTTPAcceptEncoding()
-    {
-        return filter_input(INPUT_SERVER, 'HTTP_ACCEPT_ENCODING');
-    }
-
-    public function getHTTPAcceptLanguage()
-    {
-        return filter_input(INPUT_SERVER, 'HTTP_ACCEPT_LANGUAGE');
-    }
-
-    public function getHTTPConnection()
-    {
-        return filter_input(INPUT_SERVER, 'HTTP_CONNECTION');
-    }
-
-    public function getHTTPHost()
-    {
-        return filter_input(INPUT_SERVER, 'HTTP_HOST');
-    }
-
-    public function getHTTPS()
-    {
-        return filter_input(INPUT_SERVER, 'HTTPS');
-    }
-
-    public function getHTTPUserAgent()
-    {
-        return filter_input(INPUT_SERVER, 'HTTP_USER_AGENT');
-    }
-
-    public function getPHPSelf()
-    {
-        return filter_input(INPUT_SERVER, 'PHP_SELF');
-    }
-
-    public function getQueryString()
-    {
-        return filter_input(INPUT_SERVER, 'QUERY_STRING');
-    }
-
-    public function getRemoteAddress()
-    {
-        return filter_input(INPUT_SERVER, 'REMOTE_ADDRESS');
-    }
-
-    public function getRemotePort()
-    {
-        return filter_input(INPUT_SERVER, 'REMOTE_PORT');
-    }
-
-    public function getRequestMethod()
-    {
-        return filter_input(INPUT_SERVER, 'REQUEST_METHOD');
-    }
-
-    public function getRequestScheme()
-    {
-        return filter_input(INPUT_SERVER, 'REQUEST_SCHEME');
-    }
-
-    public function getRequestTime($float = false)
-    {
-        if ($float) {
-            $retval = filter_input(INPUT_SERVER, 'REQUEST_TIME_FLOAT');
-        } else {
-            $retval = filter_input(INPUT_SERVER, 'REQUEST_TIME');
-        }
-
-        return $retval;
-    }
-
-    public function getRequestURI()
-    {
-        return filter_input(INPUT_SERVER, 'REQUEST_URI');
-    }
-
-    public function getScriptFilename()
-    {
-        return filter_input(INPUT_SERVER, 'SCRIPT_FILENAME');
-    }
-
-    public function getScriptName()
-    {
-        return filter_input(INPUT_SERVER, 'SCRIPT_NAME');
-    }
-
-    public function getServerAddress()
-    {
-        return filter_input(INPUT_SERVER, 'SERVER_ADDR');
-    }
-
-    public function getServerAdmin()
-    {
-        return filter_input(INPUT_SERVER, 'SERVER_ADMIN');
-    }
-
-    public function getServerName()
-    {
-        return filter_input(INPUT_SERVER, 'SERVER_NAME');
-    }
-
-    public function getServerPort()
-    {
-        return filter_input(INPUT_SERVER, 'SERVER_PORT');
-    }
-
-    public function getServerProtocol()
-    {
-        return filter_input(INPUT_SERVER, 'SERVER_PROTOCOL');
-    }
-
-    public function getServerSignature()
-    {
-        return filter_input(INPUT_SERVER, 'SERVER_SIGNATURE');
-    }
-
-    public function isSecureServer()
-    {
-        $https = $this->getHTTPS();
-        return $https !== false && $https !== null;
-    }
-
-    /**
-     * Checks if a server is valid.
-     * Valid servers are Built-in instances or fetched servers.
-     * @return bool Returns true if the server is valid.
-     */
-    public function isServerValid()
-    {
-        return ($this->nb_server !== null &&
-                ($this->nb_server->isBuiltIn() || $this->nb_server->isFetched()));
     }
 }

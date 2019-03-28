@@ -1,7 +1,7 @@
 {
     "name": "nabu-3/provider-apache-httpd",
     "description": "nabu-3 Provider to add Apache Server support",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "type": "nabu-provider",
     "keywords": [ "nabu-3", "nabu", "apache", "http", "https", "httpd", "provider" ],
     "license": "Apache-2.0",

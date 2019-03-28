@@ -1,6 +1,7 @@
 <?php
 
-/*  Copyright 2009-2011 Rafael Gutierrez Martinez
+/** @license
+ *  Copyright 2009-2011 Rafael Gutierrez Martinez
  *  Copyright 2012-2013 Welma WEB MKT LABS, S.L.
  *  Copyright 2014-2016 Where Ideas Simply Come True, S.L.
  *  Copyright 2017 nabu-3 Group
@@ -27,7 +28,7 @@ use \providers\apache\httpd\CApacheHTTPServer;
  * Abstract class to manage all config files of Apache HTTP Server.
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.8
+ * @version 0.0.9
  * @package \providers\apache\httpd\files
  */
 class CApacheAbstractFile extends CNabuTextBuilder
@@ -84,7 +85,7 @@ class CApacheAbstractFile extends CNabuTextBuilder
 
         if (is_dir($commondocs)) {
             $h = opendir($commondocs);
-            while (($dir = readdir($h))) {
+            while ($dir = readdir($h)) {
                 $folder = $commondocs . DIRECTORY_SEPARATOR . $dir;
                 if ($dir !== '.' && $dir !== '..' && is_dir($folder)) {
                     $output .= "\n"

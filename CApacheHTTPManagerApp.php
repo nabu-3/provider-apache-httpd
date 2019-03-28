@@ -1,6 +1,7 @@
 <?php
 
-/*  Copyright 2009-2011 Rafael Gutierrez Martinez
+/** @license
+ *  Copyright 2009-2011 Rafael Gutierrez Martinez
  *  Copyright 2012-2013 Welma WEB MKT LABS, S.L.
  *  Copyright 2014-2016 Where Ideas Simply Come True, S.L.
  *  Copyright 2017 nabu-3 Group
@@ -32,65 +33,71 @@ use nabu\core\exceptions\ENabuCoreException;
  * This class works coordinated with the bin file nabu-apache-manager.sh
  * @author Rafael Gutierrez <rgutierrez@nabu-3.com>
  * @since 0.0.1
- * @version 0.0.8
+ * @version 0.0.9
  * @package \providers\apache\httpd
  */
 class CApacheHTTPManagerApp extends CNabuCLIApplication
 {
+    /** @var string Default value for Hosted Key. */
     const DEFAULT_HOSTED_KEY = 'nabu-hosted';
 
+    /** @var mixed */
     private $mode = false;
+    /** @var string */
     private $host_path = false;
+    /** @var string */
     private $server_key = false;
 
     public function prepareEnvironment()
     {
         CNabuEngine::getEngine()->enableLogTrace();
-        //CNabuEngine::getEngine()->getMainDB()->setTrace(true);
 
-        if (($value = nbCLICheckOption('a', 'alone', '::', false))) {
+        if (nbCLICheckOption('a', 'alone', '::', false)) {
             $this->prepareStandaloneMode();
-        } elseif (($value = nbCLICheckOption('h', 'hosted', '::', false))) {
+        } elseif (nbCLICheckOption('h', 'hosted', '::', false)) {
             $this->prepareHostedMode();
-        } elseif (($value = nbCLICheckOption('c', 'clustered', '::', false))) {
+        } elseif (nbCLICheckOption('c', 'clustered', '::', false)) {
             $this->prepareClusteredMode();
         }
     }
 
+    /** Prepare Apache HTTP Server to run as Standalone mode. */
     private function prepareStandaloneMode()
     {
-        $host_path = nbCLICheckOption('p', 'path', ':', false);
-        if ($host_path && is_dir($host_path)) {
+        $param_path = nbCLICheckOption('p', 'path', ':', false);
+        if ($param_path && is_dir($param_path)) {
             $this->mode = CNabuEngine::ENGINE_MODE_STANDALONE;
-            $this->host_path = $host_path;
+            $this->host_path = $param_path;
         } else {
             echo "Invalid host path provided for Standalone Engine Mode.\n";
             echo "Please revise your params and try again.\n";
         }
     }
 
+    /** Prepare Apache HTTP Server to run as Hosted mode. */
     private function prepareHostedMode()
     {
-        $server_key = nbCLICheckOption('s', 'server', ':', false);
-        if (strlen($server_key) === 0) {
-            $server_key = self::DEFAULT_HOSTED_KEY;
+        $param_server = nbCLICheckOption('s', 'server', ':', false);
+        if (strlen($param_server) === 0) {
+            $param_server = self::DEFAULT_HOSTED_KEY;
             $this->mode = CNabuEngine::ENGINE_MODE_HOSTED;
-            $this->server_key = $server_key;
+            $this->server_key = $param_server;
         } else {
             echo "Invalid server key provided for Hosted Engine Mode.\n";
             echo "Please revise your options and try again.\n";
         }
     }
 
+    /** Prepare Apache HTTP Server to run as Cluster mode. */
     private function prepareClusteredMode()
     {
-        $server_key = nbCLICheckOption('s', 'server', ':', false);
-        if (strlen($server_key) === 0) {
+        $param_server = nbCLICheckOption('s', 'server', ':', false);
+        if (strlen($param_server) === 0) {
             echo "Missed --server or -s option.\n";
             echo "Please revise your options and try again.\n";
         } else {
             $this->mode = CNabuEngine::ENGINE_MODE_CLUSTERED;
-            $this->server_key = $server_key;
+            $this->server_key = $param_server;
         }
     }
 
@@ -108,16 +115,17 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
             case CNabuEngine::ENGINE_MODE_CLUSTERED:
                 $retval = $this->runClustered();
                 break;
+            default:
         }
 
         return $retval;
     }
 
+    /** Runs the Apache HTTP Server as Standalone mode. */
     private function runStandalone()
     {
         $nb_server = new CNabuBuiltInServer();
         $nb_server->setVirtualHostsPath($this->host_path);
-        $nb_server->setFrameworkPath(NABU_PHPUTILS_PATH);
 
         $nb_site = new CNabuBuiltInSite();
         $nb_site->setBasePath('');
@@ -133,6 +141,7 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
         }
     }
 
+    /** Runs the Apache HTTP Server as Hosted mode. */
     private function runHosted()
     {
         $nb_server = CNabuServer::findByKey($this->server_key);
@@ -144,6 +153,7 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
         }
     }
 
+    /** Runs the Apache HTTP Server as Clustered mode. */
     private function runClustered()
     {
         $nb_server = CNabuServer::findByKey($this->server_key);
@@ -159,7 +169,10 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
         }
     }
 
-    private function displayServerConfig($apache_server)
+    /** Display the Apache HTTP Server configuration.
+      * @param CApacheHTTPServer $apache_server The Apache HTTP Server instance to display.
+      */
+    private function displayServerConfig(CApacheHTTPServer $apache_server)
     {
         echo "Apache HTTP Server detected\n";
         echo "    Version    : " . $apache_server->getServerVersion() . "\n";
@@ -168,7 +181,11 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
         echo "\n";
     }
 
-    private function checkHostFolders($path)
+    /** Check if Host Folders exists.
+      * @param string $path Base path to check.
+      * @return bool Returns true if success.
+      */
+    private function checkHostFolders(string $path) : bool
     {
         echo "Checking folders of host...\n";
         $retval =
@@ -182,7 +199,13 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
         return $retval;
     }
 
-    private function checkFolder($path, $folder, $create = false)
+    /** Check if a folder exists inside a path.
+      * @param string $path Base path to check folder.
+      * @param string $folder Folder to be checked.
+      * @param bool $create If true creates the folder if not exists.
+      * @return bool Returns true if success. In case of creation of folder, returns false if folder cannot be created.
+      */
+    private function checkFolder(string $path, string $folder, bool $create = false) : bool
     {
         $retval = false;
 
@@ -193,7 +216,7 @@ class CApacheHTTPManagerApp extends CNabuCLIApplication
             echo "EXISTS\n";
             $retval = true;
         } elseif ($create) {
-            if (($retval = mkdir($target))) {
+            if ($retval = mkdir($target)) {
                 echo "CREATED\n";
             } else {
                 echo "ERROR\n";
